@@ -6,6 +6,9 @@ import { errorHandler } from './middleware/errorHandler';
 import hallsRouter from './routes/halls';
 import tablesRouter from './routes/tables';
 import reservationsRouter from './routes/reservations';
+import authRouter from './routes/auth';
+import usersRouter from './routes/users';
+import rolesRouter from './routes/roles';
 
 dotenv.config();
 
@@ -31,6 +34,9 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/roles', rolesRouter);
 app.use('/api/halls', hallsRouter);
 app.use('/api/tables', tablesRouter);
 app.use('/api/reservations', reservationsRouter);

@@ -10,6 +10,9 @@ export type TableStatus = z.infer<typeof TableStatus>;
 export const ReservationStatus = z.enum(['confirmed', 'pending', 'cancelled', 'completed']);
 export type ReservationStatus = z.infer<typeof ReservationStatus>;
 
+export const UserRole = z.enum(['admin', 'hostess']);
+export type UserRole = z.infer<typeof UserRole>;
+
 // ===== BASIC TYPES =====
 export const Position = z.object({
   x: z.number(),
@@ -89,6 +92,27 @@ export const Reservation = z.object({
 });
 export type Reservation = z.infer<typeof Reservation>;
 
+// ===== ROLE =====
+export const Role = z.object({
+  id: z.string(),
+  name: UserRole,
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type Role = z.infer<typeof Role>;
+
+// ===== USER =====
+export const User = z.object({
+  id: z.string(),
+  name: z.string().min(2),
+  login: z.string().min(3),
+  roleId: z.string(),
+  role: Role.optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type User = z.infer<typeof User>;
+
 // ===== DTO SCHEMAS =====
 
 // Hall DTOs
@@ -143,6 +167,31 @@ export const ReservationQueryDto = z.object({
   tableId: z.string().optional(),
 });
 export type ReservationQueryDto = z.infer<typeof ReservationQueryDto>;
+
+// User DTOs
+export const CreateUserDto = z.object({
+  name: z.string().min(2),
+  login: z.string().min(3),
+  password: z.string().min(6),
+  roleId: z.string(),
+});
+export type CreateUserDto = z.infer<typeof CreateUserDto>;
+
+export const UpdateUserDto = CreateUserDto.partial();
+export type UpdateUserDto = z.infer<typeof UpdateUserDto>;
+
+// Auth DTOs
+export const LoginDto = z.object({
+  login: z.string().min(3),
+  password: z.string().min(6),
+});
+export type LoginDto = z.infer<typeof LoginDto>;
+
+export const AuthResponse = z.object({
+  user: User,
+  token: z.string(),
+});
+export type AuthResponse = z.infer<typeof AuthResponse>;
 
 // ===== API RESPONSE TYPES =====
 export interface ApiResponse<T> {

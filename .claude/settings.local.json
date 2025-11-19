@@ -21,7 +21,18 @@
       "Bash(npx tsc:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(dir /b)",
+      "Bash(test:*)",
+      "Bash(npm audit:*)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" --version)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\15\\bin\\psql.exe\" --version)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\14\\bin\\psql.exe\" --version)",
+      "Bash(set PGPASSWORD=password:*)",
+      "Bash(set:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate:*)"
     ],
     "deny": [],
     "ask": []

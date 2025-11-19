@@ -1,0 +1,183 @@
+/* Layout */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: calc(100vh - 64px - 24px * 2);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    height: auto;
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.headerContent {}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .subtitle {
+    font-size: 16px;
+  }
+}
+/* Content */
+.content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: scroll;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    overflow: visible;
+  }
+}
+
+/* Halls List */
+.hallsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+@media (max-width: 1024px) {
+  .hallsList {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+.hallCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hallCard.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.hallCard:hover {
+  background: #f9fafb;
+}
+
+.hallIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.hallInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.hallName {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.hallMeta {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.hallActions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hallCard:hover .hallActions {
+  opacity: 1;
+}
+
+@media (max-width: 1024px) {
+  .hallActions {
+    opacity: 1;
+  }
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  color: #6b7280;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

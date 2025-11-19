@@ -1,0 +1,120 @@
+/* Card Component Styles */
+
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.padding1 { padding: 4px; }
+.padding2 { padding: 8px; }
+.padding3 { padding: 12px; }
+.padding4 { padding: 16px; }
+.padding5 { padding: 20px; }
+.padding6 { padding: 24px; }
+.padding8 { padding: 32px; }
+.padding10 { padding: 40px; }
+
+.hoverable {
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* Card Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.actionContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Card Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 8px;
+  }
+
+  .padding6 { padding: 16px; }
+  .padding8 { padding: 20px; }
+  .padding10 { padding: 24px; }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .actionContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .padding4 { padding: 12px; }
+  .padding6 { padding: 12px; }
+  .padding8 { padding: 16px; }
+}

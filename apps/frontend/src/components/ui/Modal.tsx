@@ -1,7 +1,6 @@
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
 import { ReactNode, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import styles from './Modal.module.css';
 
 interface ModalProps {
   isOpen: boolean;
@@ -92,13 +91,10 @@ export const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }:
   if (!isOpen) return null;
 
   return (
-    <Backdrop
-      onClick={onClose}
-      role="presentation"
-    >
-      <ModalContainer
+    <div className={styles.backdrop} onClick={onClose} role="presentation">
+      <div
         ref={modalRef}
-        $size={size}
+        className={`${styles.modal} ${styles[size]}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -106,128 +102,19 @@ export const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }:
         tabIndex={-1}
       >
         {title && (
-          <ModalHeader>
-            <ModalTitle id="modal-title">{title}</ModalTitle>
-            <CloseButton
-              onClick={onClose}
-              aria-label="Закрыть модальное окно"
-            >
+          <div className={styles.header}>
+            <h2 id="modal-title" className={styles.title}>
+              {title}
+            </h2>
+            <button className={styles.closeButton} onClick={onClose} aria-label="Закрыть модальное окно">
               <X size={20} />
-            </CloseButton>
-          </ModalHeader>
+            </button>
+          </div>
         )}
-        
-        <ModalBody>{children}</ModalBody>
-        {footer && <ModalFooter>{footer}</ModalFooter>}
-      </ModalContainer>
-    </Backdrop>
+
+        <div className={styles.body}>{children}</div>
+        {footer && <div className={styles.footer}>{footer}</div>}
+      </div>
+    </div>
   );
 };
-
-const Backdrop = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing[4]};
-  z-index: ${theme.zIndex.modalBackdrop};
-  animation: fadeIn ${theme.transitions.base};
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-`;
-
-const sizeMap = {
-  sm: '400px',
-  md: '600px',
-  lg: '800px',
-  xl: '1000px',
-};
-
-const ModalContainer = styled.div<{ $size: 'sm' | 'md' | 'lg' | 'xl' }>`
-  position: relative;
-  width: 100%;
-  max-width: ${(props) => sizeMap[props.$size]};
-  max-height: 90vh;
-  background: white;
-  border-radius: ${theme.borderRadius['2xl']};
-  box-shadow: ${theme.shadows['2xl']};
-  display: flex;
-  flex-direction: column;
-  animation: slideUp ${theme.transitions.base};
-  z-index: ${theme.zIndex.modal};
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.divider};
-`;
-
-const ModalTitle = styled.h2`
-  font-size: ${theme.typography.fontSize['2xl']};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-`;
-
-const CloseButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: ${theme.colors.text.secondary};
-  border-radius: ${theme.borderRadius.lg};
-  cursor: pointer;
-  transition: all ${theme.transitions.fast};
-
-  &:hover {
-    background: ${theme.colors.gray[100]};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const CloseButtonAbsolute = styled(CloseButton)`
-  position: absolute;
-  top: ${theme.spacing[4]};
-  right: ${theme.spacing[4]};
-  z-index: 1;
-`;
-
-const ModalBody = styled.div`
-  flex: 1;
-  padding: ${theme.spacing[6]};
-  overflow-y: auto;
-`;
-
-const ModalFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.divider};
-`;

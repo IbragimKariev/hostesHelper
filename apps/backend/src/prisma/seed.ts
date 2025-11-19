@@ -9,6 +9,45 @@ async function main() {
   await prisma.reservation.deleteMany();
   await prisma.table.deleteMany();
   await prisma.hall.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.role.deleteMany();
+
+  // Создание ролей
+  const adminRole = await prisma.role.create({
+    data: {
+      name: 'admin',
+    },
+  });
+
+  const hostessRole = await prisma.role.create({
+    data: {
+      name: 'hostess',
+    },
+  });
+
+  console.log('✅ Roles created');
+
+  // Создание пользователей (пароли: admin123 и hostess123)
+  // В реальном приложении пароли должны быть захешированы с помощью bcrypt
+  await prisma.user.create({
+    data: {
+      name: 'Администратор',
+      login: 'admin',
+      password: 'admin123', // TODO: хешировать пароль
+      roleId: adminRole.id,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      name: 'Хостес',
+      login: 'hostess',
+      password: 'hostess123', // TODO: хешировать пароль
+      roleId: hostessRole.id,
+    },
+  });
+
+  console.log('✅ Users created');
 
   // Создание залов
   const mainHall = await prisma.hall.create({

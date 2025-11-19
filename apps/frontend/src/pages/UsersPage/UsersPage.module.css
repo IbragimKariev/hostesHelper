@@ -1,0 +1,228 @@
+/* UsersPage Styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.usersTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.usersTable thead {
+  background: #f9fafb;
+}
+
+.usersTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.usersTable tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s ease;
+}
+
+.usersTable tbody tr:hover {
+  background: #f9fafb;
+}
+
+.usersTable td {
+  padding: 16px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.userName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.userLogin {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.roleBadge.admin {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.roleBadge.hostess {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actionButton:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.actionButton.danger {
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.actionButton.danger:hover {
+  background: #fef2f2;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 64px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 64px;
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .usersTable {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .usersTable thead {
+    display: none;
+  }
+
+  .usersTable tbody,
+  .usersTable tr,
+  .usersTable td {
+    display: block;
+  }
+
+  .usersTable tbody tr {
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .usersTable td {
+    padding: 8px 0;
+    border: none;
+  }
+
+  .usersTable td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actionButton {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 16px;
+  }
+
+  .emptyState {
+    padding: 48px 16px;
+  }
+
+  .emptyIcon {
+    font-size: 48px;
+  }
+}

@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { Button, Input, Select } from '@/components/ui';
-import { useCreateReservation, useUpdateReservation } from '@/hooks/useReservations';
+import { Button, Input, Select, Modal } from '@/components/ui';
+import { useCreateReservation, useUpdateReservation, useReservations } from '@/hooks/useReservations';
 import type { Reservation, CreateReservationDto } from '@hostes/shared';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 
 interface ReservationFormProps {
   onClose: () => void;
@@ -27,6 +28,8 @@ export const ReservationForm = ({
 }: ReservationFormProps) => {
   const createReservation = useCreateReservation();
   const updateReservation = useUpdateReservation();
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [conflictingReservations, setConflictingReservations] = useState<Reservation[]>([]);
 
   // Функция для форматирования даты в YYYY-MM-DD (для input type="date")
   const formatDateToYYYYMMDD = (date: Date | string): string => {
@@ -75,9 +78,53 @@ export const ReservationForm = ({
   });
 
   const selectedTableId = watch('tableId');
+  const selectedDate = watch('date');
+  const selectedTime = watch('time');
+  const selectedDuration = watch('duration');
   const selectedTable = tables.find((t) => t.id === selectedTableId);
 
+  // Получить все бронирования для выбранной даты
+  const { data: allReservations } = useReservations({ date: selectedDate, hallId });
+
+  // Проверка конфликтов при изменении данных формы
+  useEffect(() => {
+    if (!selectedTableId || !selectedDate || !selectedTime || !selectedDuration) {
+      setConflictingReservations([]);
+      return;
+    }
+
+    const [startHour, startMinute] = selectedTime.split(':').map(Number);
+    const startTimeMinutes = startHour * 60 + startMinute;
+    const endTimeMinutes = startTimeMinutes + parseFloat(selectedDuration) * 60;
+
+    const conflicts = (allReservations || []).filter((r) => {
+      if (reservation && r.id === reservation.id) return false;
+      if (r.tableId !== selectedTableId) return false;
+      if (r.status === 'cancelled') return false;
+
+      const [rHour, rMinute] = r.time.split(':').map(Number);
+      const rStartMinutes = rHour * 60 + rMinute;
+      const rEndMinutes = rStartMinutes + r.duration * 60;
+
+      const hasOverlap =
+        (startTimeMinutes >= rStartMinutes && startTimeMinutes < rEndMinutes) ||
+        (endTimeMinutes > rStartMinutes && endTimeMinutes <= rEndMinutes) ||
+        (startTimeMinutes <= rStartMinutes && endTimeMinutes >= rEndMinutes);
+
+      return hasOverlap;
+    });
+
+    setConflictingReservations(conflicts);
+    if (conflicts.length > 0) {
+      setShowConflictModal(true);
+    }
+  }, [selectedTableId, selectedDate, selectedTime, selectedDuration, allReservations, reservation]);
+
   const onSubmit = async (data: any) => {
+    if (conflictingReservations.length > 0 && !reservation) {
+      setShowConflictModal(true);
+      return;
+    }
     try {
       const formData: CreateReservationDto = {
         tableId: data.tableId,
@@ -108,15 +155,30 @@ export const ReservationForm = ({
   };
 
   const minDate = new Date().toISOString().split('T')[0];
+  const hasConflict = conflictingReservations.length > 0;
 
   return (
+    <>
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormHeader>
         <FormTitle>{reservation ? 'Редактировать бронирование' : 'Новое бронирование'}</FormTitle>
         <CloseButton onClick={onClose} type="button">
-          <X size={20} /> 
+          <X size={20} />
         </CloseButton>
       </FormHeader>
+
+      {hasConflict && !reservation && (
+        <ConflictWarning>
+          <AlertTriangle size={20} />
+          <div>
+            <ConflictTitle>Столик занят!</ConflictTitle>
+            <ConflictText>
+              На выбранное время уже есть {conflictingReservations.length}{' '}
+              {conflictingReservations.length === 1 ? 'бронирование' : 'бронирований'}. Выберите другое время или столик.
+            </ConflictText>
+          </div>
+        </ConflictWarning>
+      )}
 
       <FormContent>
         <FormRow>
@@ -233,11 +295,40 @@ export const ReservationForm = ({
         <Button variant="ghost" type="button" onClick={onClose}>
           Отмена
         </Button>
-        <Button type="submit" loading={isSubmitting}>
+        <Button type="submit" loading={isSubmitting} disabled={hasConflict && !reservation}>
           {reservation ? 'Сохранить' : 'Создать бронирование'}
         </Button>
       </FormFooter>
     </Form>
+
+    <Modal isOpen={showConflictModal} onClose={() => setShowConflictModal(false)} title="Столик занят" size="sm">
+      <ConflictModalContent>
+        <ConflictModalIcon>
+          <AlertTriangle size={48} color="#ef4444" />
+        </ConflictModalIcon>
+        <ConflictModalText>
+          На выбранное время столик №{selectedTable?.number} уже забронирован:
+        </ConflictModalText>
+        <ConflictList>
+          {conflictingReservations.map((r) => (
+            <ConflictItem key={r.id}>
+              <ConflictTime>{r.time} ({r.duration}ч)</ConflictTime>
+              <ConflictCustomer>{r.customerName}</ConflictCustomer>
+              <ConflictStatus $status={r.status}>
+                {r.status === 'confirmed' && 'Подтверждено'}
+                {r.status === 'pending' && 'Ожидание'}
+              </ConflictStatus>
+            </ConflictItem>
+          ))}
+        </ConflictList>
+        <ConflictModalActions>
+          <Button variant="primary" onClick={() => setShowConflictModal(false)} fullWidth>
+            Понятно
+          </Button>
+        </ConflictModalActions>
+      </ConflictModalContent>
+    </Modal>
+    </>
   );
 };
 
@@ -383,4 +474,88 @@ const FormFooter = styled.div`
       width: 100%;
     }
   }
+`;
+
+// Conflict Warning Styles
+const ConflictWarning = styled.div`
+  display: flex;
+  gap: ${theme.spacing[3]};
+  padding: ${theme.spacing[4]};
+  background: ${theme.colors.error[50]};
+  border: 1px solid ${theme.colors.error[200]};
+  border-left: 4px solid ${theme.colors.error[500]};
+  border-radius: ${theme.borderRadius.lg};
+  color: ${theme.colors.error[700]};
+`;
+
+const ConflictTitle = styled.div`
+  font-weight: ${theme.typography.fontWeight.semibold};
+  margin-bottom: ${theme.spacing[1]};
+`;
+
+const ConflictText = styled.div`
+  font-size: ${theme.typography.fontSize.sm};
+`;
+
+// Conflict Modal Styles
+const ConflictModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing[4]};
+  align-items: center;
+  text-align: center;
+  padding: ${theme.spacing[4]} 0;
+`;
+
+const ConflictModalIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ConflictModalText = styled.p`
+  font-size: ${theme.typography.fontSize.base};
+  color: ${theme.colors.text.secondary};
+  margin: 0;
+`;
+
+const ConflictList = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing[2]};
+`;
+
+const ConflictItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${theme.spacing[3]};
+  background: ${theme.colors.gray[50]};
+  border-radius: ${theme.borderRadius.lg};
+  border-left: 3px solid ${theme.colors.error[500]};
+`;
+
+const ConflictTime = styled.div`
+  font-weight: ${theme.typography.fontWeight.semibold};
+  color: ${theme.colors.text.primary};
+`;
+
+const ConflictCustomer = styled.div`
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.typography.fontSize.sm};
+`;
+
+const ConflictStatus = styled.div<{ $status: string }>`
+  font-size: ${theme.typography.fontSize.sm};
+  font-weight: ${theme.typography.fontWeight.medium};
+  color: ${(props) =>
+    props.$status === 'confirmed' ? theme.colors.success[600] : theme.colors.warning[600]};
+`;
+
+const ConflictModalActions = styled.div`
+  width: 100%;
+  display: flex;
+  gap: ${theme.spacing[2]};
+  margin-top: ${theme.spacing[2]};
 `;

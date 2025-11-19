@@ -78,3 +78,31 @@ model Reservation {
   @@index([status])
   @@map("reservations")
 }
+
+// Роль пользователя
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique // 'admin' | 'hostess'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
+// Пользователь
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  login     String   @unique
+  password  String
+  roleId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@index([login])
+  @@map("users")
+}
