@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Зал ресторана
+model Hall {
+  id          String   @id @default(uuid())
+  name        String
+  width       Float
+  height      Float
+  pixelRatio  Float    @default(50)
+  sections    Json     @default("[]") // Section[]
+  walls       Json     @default("[]") // Wall[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tables       Table[]
+  reservations Reservation[]
+
+  @@map("halls")
+}
+
+// Столик
+model Table {
+  id                 String   @id @default(uuid())
+  number             Int
+  seats              Int
+  shape              String   // 'rectangle' | 'circle' | 'oval'
+  positionX          Float
+  positionY          Float
+  sizeWidth          Float
+  sizeHeight         Float
+  status             String   @default("available") // 'available' | 'occupied' | 'reserved' | 'cleaning'
+  section            String?
+  rotation           Float    @default(0)
+  seatConfiguration  String?
+  hallId             String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  hall         Hall          @relation(fields: [hallId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  @@unique([hallId, number])
+  @@map("tables")
+}
+
+// Бронирование
+model Reservation {
+  id              String   @id @default(uuid())
+  tableId         String
+  tableNumber     Int
+  hallId          String
+  customerName    String
+  customerPhone   String
+  guests          Int
+  date            DateTime
+  time            String
+  duration        Float
+  status          String   @default("pending") // 'confirmed' | 'pending' | 'cancelled' | 'completed'
+  specialRequests String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  table Table @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  hall  Hall  @relation(fields: [hallId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([hallId])
+  @@index([status])
+  @@map("reservations")
+}
