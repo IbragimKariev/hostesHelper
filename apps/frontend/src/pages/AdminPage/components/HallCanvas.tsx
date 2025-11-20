@@ -209,29 +209,35 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
       };
 
       createTable.mutate(newTable);
-    } else if ((mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') && e.target === e.currentTarget) {
-      // Начинаем или заканчиваем рисование стены
-      if (!drawingWall) {
-        // Начинаем рисование
-        setDrawingWall({ start: { x, y } });
-      } else {
-        // Заканчиваем рисование
-        const wallType: WallType = mode === 'add-wall' ? 'wall' : mode === 'add-window' ? 'window' : 'entrance';
+    } else if (mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') {
+      // Проверяем, что не кликнули на столик
+      const target = e.target as HTMLElement;
+      const isTableClick = target.closest('[role="button"]');
 
-        const newWall: Wall = {
-          id: crypto.randomUUID(),
-          start: drawingWall.start,
-          end: { x, y },
-          type: wallType,
-        };
+      if (!isTableClick) {
+        // Начинаем или заканчиваем рисование стены
+        if (!drawingWall) {
+          // Начинаем рисование
+          setDrawingWall({ start: { x, y } });
+        } else {
+          // Заканчиваем рисование
+          const wallType: WallType = mode === 'add-wall' ? 'wall' : mode === 'add-window' ? 'window' : 'entrance';
 
-        const updatedWalls = [...(hall.walls || []), newWall];
-        updateHall.mutate({
-          id: hall.id,
-          data: { walls: updatedWalls },
-        });
+          const newWall: Wall = {
+            id: crypto.randomUUID(),
+            start: drawingWall.start,
+            end: { x, y },
+            type: wallType,
+          };
 
-        setDrawingWall(null);
+          const updatedWalls = [...(hall.walls || []), newWall];
+          updateHall.mutate({
+            id: hall.id,
+            data: { walls: updatedWalls },
+          });
+
+          setDrawingWall(null);
+        }
       }
     } else if (mode === 'select' && e.target === e.currentTarget) {
       setSelectedTableId(null);
