@@ -91,7 +91,7 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
   const updateTableWithToast = useUpdateTable();
   const createTable = useCreateTable();
   const deleteTable = useDeleteTable();
-  const updateHall = useUpdateHall();
+  const updateHall = useUpdateHall({ silent: true });
 
   const selectedTable = hall.tables?.find((t) => t.id === selectedTableId);
 
