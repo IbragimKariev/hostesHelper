@@ -46,17 +46,25 @@ const WallLine = ({
   const x2 = wall.end.x * pixelRatio;
   const y2 = wall.end.y * pixelRatio;
 
+  // Устанавливаем значение по умолчанию, если wallType не указан
+  const wallType = wall.wallType || 'wall';
+
   let stroke: string = theme.colors.gray[800];
   let strokeWidth = 6;
   let strokeDasharray: string | 'none' = 'none';
 
-  if (wall.type === 'window') {
-    stroke = theme.colors.primary[500];
-    strokeWidth = 4;
-    strokeDasharray = '10 5';
-  } else if (wall.type === 'entrance') {
-    stroke = theme.colors.success[500];
+  if (wallType === 'window') {
+    stroke = '#3B82F6'; // Яркий синий для окна
+    strokeWidth = 5;
+    strokeDasharray = '8 4';
+  } else if (wallType === 'entrance') {
+    stroke = '#10B981'; // Яркий зеленый для входа
     strokeWidth = 8;
+    strokeDasharray = 'none';
+  } else {
+    // wall - темно-серый/черный
+    stroke = '#1F2937';
+    strokeWidth = 6;
     strokeDasharray = 'none';
   }
 
@@ -228,10 +236,11 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
             id: generateUUID(),
             start: drawingWall.start,
             end: { x, y },
-            type: wallType,
+            wallType: wallType,
           };
 
           const updatedWalls = [...(hall.walls || []), newWall];
+
           updateHall.mutate({
             id: hall.id,
             data: { walls: updatedWalls },
@@ -333,13 +342,13 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
                 y2={mousePosition.y * hall.pixelRatio}
                 stroke={
                   mode === 'add-wall'
-                    ? theme.colors.gray[800]
+                    ? '#1F2937'
                     : mode === 'add-window'
-                    ? theme.colors.primary[500]
-                    : theme.colors.success[500]
+                    ? '#3B82F6'
+                    : '#10B981'
                 }
-                strokeWidth={mode === 'add-entrance' ? 8 : mode === 'add-window' ? 4 : 6}
-                strokeDasharray={mode === 'add-window' ? '10 5' : 'none'}
+                strokeWidth={mode === 'add-entrance' ? 8 : mode === 'add-window' ? 5 : 6}
+                strokeDasharray={mode === 'add-window' ? '8 4' : 'none'}
                 strokeLinecap="round"
                 opacity={0.5}
               />
@@ -353,10 +362,10 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
                 r={6}
                 fill={
                   mode === 'add-wall'
-                    ? theme.colors.gray[800]
+                    ? '#1F2937'
                     : mode === 'add-window'
-                    ? theme.colors.primary[500]
-                    : theme.colors.success[500]
+                    ? '#3B82F6'
+                    : '#10B981'
                 }
                 opacity={0.7}
               />
@@ -445,6 +454,25 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
         <InfoItem>Размер зала: {hall.width}×{hall.height} м</InfoItem>
         <InfoItem>Столиков: {hall.tables?.length || 0}</InfoItem>
         <InfoItem>Стен/окон/входов: {hall.walls?.length || 0}</InfoItem>
+
+        {/* Легенда цветов */}
+        {(mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance' || (hall.walls && hall.walls.length > 0)) && (
+          <ColorLegend>
+            <LegendItem>
+              <LegendLine $color="#1F2937" $dasharray="none" $width={4} />
+              <LegendLabel>Стена</LegendLabel>
+            </LegendItem>
+            <LegendItem>
+              <LegendLine $color="#3B82F6" $dasharray="8 4" $width={4} />
+              <LegendLabel>Окно</LegendLabel>
+            </LegendItem>
+            <LegendItem>
+              <LegendLine $color="#10B981" $dasharray="none" $width={6} />
+              <LegendLabel>Вход</LegendLabel>
+            </LegendItem>
+          </ColorLegend>
+        )}
+
         {mode === 'add-table' && <InfoHint>💡 Кликните на холст, чтобы добавить столик</InfoHint>}
         {(mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') && !drawingWall && (
           <InfoHint>💡 Кликните на холст, чтобы начать линию • Двойной клик для удаления</InfoHint>
@@ -597,4 +625,45 @@ const InfoHint = styled.div`
   color: ${theme.colors.primary[600]};
   font-weight: ${theme.typography.fontWeight.medium};
   margin-left: auto;
+`;
+
+const ColorLegend = styled.div`
+  display: flex;
+  gap: ${theme.spacing[4]};
+  align-items: center;
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  background: ${theme.colors.gray[50]};
+  border-radius: ${theme.borderRadius.md};
+  border: 1px solid ${theme.colors.border};
+`;
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const LegendLine = styled.div<{ $color: string; $dasharray: string; $width: number }>`
+  width: 32px;
+  height: ${(props) => props.$width}px;
+  background: ${(props) => props.$color};
+  border-radius: 2px;
+
+  ${(props) =>
+    props.$dasharray !== 'none' && `
+      background: repeating-linear-gradient(
+        to right,
+        ${props.$color} 0px,
+        ${props.$color} 8px,
+        transparent 8px,
+        transparent 12px
+      );
+    `
+  }
+`;
+
+const LegendLabel = styled.span`
+  font-size: ${theme.typography.fontSize.xs};
+  color: ${theme.colors.text.secondary};
+  font-weight: ${theme.typography.fontWeight.medium};
 `;

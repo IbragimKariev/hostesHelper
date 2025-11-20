@@ -11,6 +11,10 @@
     "db:seed": "tsx src/prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
+    "db:migrate-walls": "tsx src/scripts/migrate-walls.ts",
+    "test:wall-types": "tsx src/scripts/test-wall-types.ts",
+    "check:api-response": "tsx src/scripts/check-api-response.ts",
+    "add:test-walls": "tsx src/scripts/add-test-walls.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

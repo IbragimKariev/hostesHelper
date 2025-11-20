@@ -48,29 +48,22 @@ export const useUpdateHall = (options?: { silent?: boolean }) => {
       const previousHalls = queryClient.getQueryData(['halls']);
       const previousHall = queryClient.getQueryData(['halls', id]);
 
-      // Оптимистично обновляем кэш halls
+      // Оптимистично обновляем кэш halls (кэш хранит Hall[], не { data: Hall[] })
       queryClient.setQueryData(['halls'], (old: any) => {
-        if (!old?.data) return old;
+        if (!old) return old;
 
-        return {
-          ...old,
-          data: old.data.map((hall: any) => {
-            if (hall.id === id) {
-              return { ...hall, ...data };
-            }
-            return hall;
-          }),
-        };
+        return old.map((hall: any) => {
+          if (hall.id === id) {
+            return { ...hall, ...data };
+          }
+          return hall;
+        });
       });
 
-      // Оптимистично обновляем кэш конкретного зала
+      // Оптимистично обновляем кэш конкретного зала (кэш хранит Hall, не { data: Hall })
       queryClient.setQueryData(['halls', id], (old: any) => {
-        if (!old?.data) return old;
-
-        return {
-          ...old,
-          data: { ...old.data, ...data },
-        };
+        if (!old) return old;
+        return { ...old, ...data };
       });
 
       return { previousHalls, previousHall };
@@ -85,9 +78,22 @@ export const useUpdateHall = (options?: { silent?: boolean }) => {
       }
       toast.error(`Ошибка: ${error.message}`);
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['halls'] });
-      queryClient.invalidateQueries({ queryKey: ['halls', variables.id] });
+    onSuccess: (updatedHall, variables) => {
+      // updatedHall - это уже распакованный Hall из API
+      // Обновляем кэш с реальными данными с сервера
+      queryClient.setQueryData(['halls'], (old: any) => {
+        if (!old) return old;
+
+        return old.map((hall: any) => {
+          if (hall.id === variables.id) {
+            return updatedHall;
+          }
+          return hall;
+        });
+      });
+
+      queryClient.setQueryData(['halls', variables.id], updatedHall);
+
       if (!options?.silent) {
         toast.success('Зал успешно обновлён');
       }

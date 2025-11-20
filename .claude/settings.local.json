@@ -3,7 +3,16 @@
     "allow": [
       "Bash(git push)",
       "Bash(npm run build:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run db:migrate-walls:*)",
+      "Bash(node -e:*)",
+      "Bash(npm run test:wall-types:*)",
+      "Bash(node test-normalize.js:*)",
+      "Bash(del test-normalize.js)",
+      "Bash(npm run check:api-response:*)",
+      "Bash(npm run add:test-walls:*)"
     ],
     "deny": [],
     "ask": []

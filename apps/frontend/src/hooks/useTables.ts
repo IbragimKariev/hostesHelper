@@ -36,48 +36,42 @@ export const useCreateTable = () => {
       // Создаём временный ID для нового столика
       const tempId = `temp-${Date.now()}`;
 
-      // Оптимистично добавляем столик в кэш halls
+      // Оптимистично добавляем столик в кэш halls (кэш хранит Hall[])
       queryClient.setQueryData(['halls'], (old: any) => {
-        if (!old?.data) return old;
+        if (!old) return old;
 
-        return {
-          ...old,
-          data: old.data.map((hall: any) => {
-            if (hall.id === newTable.hallId) {
-              return {
-                ...hall,
-                tables: [
-                  ...(hall.tables || []),
-                  {
-                    id: tempId,
-                    ...newTable,
-                    status: newTable.status || 'available',
-                    rotation: newTable.rotation || 0,
-                  },
-                ],
-              };
-            }
-            return hall;
-          }),
-        };
+        return old.map((hall: any) => {
+          if (hall.id === newTable.hallId) {
+            return {
+              ...hall,
+              tables: [
+                ...(hall.tables || []),
+                {
+                  id: tempId,
+                  ...newTable,
+                  status: newTable.status || 'available',
+                  rotation: newTable.rotation || 0,
+                },
+              ],
+            };
+          }
+          return hall;
+        });
       });
 
-      // Оптимистично добавляем столик в кэш tables
+      // Оптимистично добавляем столик в кэш tables (кэш хранит Table[])
       queryClient.setQueryData(['tables', newTable.hallId], (old: any) => {
-        if (!old?.data) return old;
+        if (!old) return old;
 
-        return {
+        return [
           ...old,
-          data: [
-            ...(old.data || []),
-            {
-              id: tempId,
-              ...newTable,
-              status: newTable.status || 'available',
-              rotation: newTable.rotation || 0,
-            },
-          ],
-        };
+          {
+            id: tempId,
+            ...newTable,
+            status: newTable.status || 'available',
+            rotation: newTable.rotation || 0,
+          },
+        ];
       });
 
       return { previousHalls, previousTables, tempId };
@@ -92,11 +86,33 @@ export const useCreateTable = () => {
       }
       toast.error(`Ошибка: ${error.message}`);
     },
-    onSuccess: (_, variables) => {
-      // Обновляем данные после успешного ответа сервера
-      queryClient.invalidateQueries({ queryKey: ['tables'] });
-      queryClient.invalidateQueries({ queryKey: ['halls', variables.hallId] });
-      queryClient.invalidateQueries({ queryKey: ['halls'] });
+    onSuccess: (realTable, variables) => {
+      // realTable - это уже распакованный Table из API
+
+      queryClient.setQueryData(['halls'], (old: any) => {
+        if (!old) return old;
+
+        return old.map((hall: any) => {
+          if (hall.id === variables.hallId) {
+            return {
+              ...hall,
+              tables: hall.tables.map((t: any) =>
+                t.id.startsWith('temp-') && t.number === realTable.number ? realTable : t
+              ),
+            };
+          }
+          return hall;
+        });
+      });
+
+      queryClient.setQueryData(['tables', variables.hallId], (old: any) => {
+        if (!old) return old;
+
+        return old.map((t: any) =>
+          t.id.startsWith('temp-') && t.number === realTable.number ? realTable : t
+        );
+      });
+
       toast.success('Столик добавлен');
     },
   });
@@ -128,32 +144,25 @@ export const useCreateTablesBulk = () => {
         rotation: table.rotation || 0,
       }));
 
-      // Оптимистично добавляем столики в кэш halls
+      // Оптимистично добавляем столики в кэш halls (кэш хранит Hall[])
       queryClient.setQueryData(['halls'], (old: any) => {
-        if (!old?.data) return old;
+        if (!old) return old;
 
-        return {
-          ...old,
-          data: old.data.map((hall: any) => {
-            if (hall.id === hallId) {
-              return {
-                ...hall,
-                tables: [...(hall.tables || []), ...tempTables],
-              };
-            }
-            return hall;
-          }),
-        };
+        return old.map((hall: any) => {
+          if (hall.id === hallId) {
+            return {
+              ...hall,
+              tables: [...(hall.tables || []), ...tempTables],
+            };
+          }
+          return hall;
+        });
       });
 
-      // Оптимистично добавляем столики в кэш tables
+      // Оптимистично добавляем столики в кэш tables (кэш хранит Table[])
       queryClient.setQueryData(['tables', hallId], (old: any) => {
-        if (!old?.data) return old;
-
-        return {
-          ...old,
-          data: [...(old.data || []), ...tempTables],
-        };
+        if (!old) return old;
+        return [...old, ...tempTables];
       });
 
       return { previousHalls, previousTables };
@@ -171,12 +180,35 @@ export const useCreateTablesBulk = () => {
       }
       toast.error(`Ошибка: ${error.message}`);
     },
-    onSuccess: (_, variables) => {
-      if (variables.length > 0) {
-        queryClient.invalidateQueries({ queryKey: ['tables'] });
-        queryClient.invalidateQueries({ queryKey: ['halls', variables[0].hallId] });
-        queryClient.invalidateQueries({ queryKey: ['halls'] });
-      }
+    onSuccess: (realTables, variables) => {
+      if (variables.length === 0) return;
+
+      // realTables - это уже распакованный Table[] из API
+      const hallId = variables[0].hallId;
+
+      queryClient.setQueryData(['halls'], (old: any) => {
+        if (!old) return old;
+
+        return old.map((hall: any) => {
+          if (hall.id === hallId) {
+            // Заменяем все временные столики реальными
+            const nonTempTables = hall.tables.filter((t: any) => !t.id.startsWith('temp-'));
+            return {
+              ...hall,
+              tables: [...nonTempTables, ...realTables],
+            };
+          }
+          return hall;
+        });
+      });
+
+      queryClient.setQueryData(['tables', hallId], (old: any) => {
+        if (!old) return old;
+
+        const nonTempTables = old.filter((t: any) => !t.id.startsWith('temp-'));
+        return [...nonTempTables, ...realTables];
+      });
+
       toast.success(`${variables.length} столиков добавлено`);
     },
   });
@@ -254,21 +286,18 @@ export const useDeleteTable = () => {
       // Сохраняем предыдущее состояние
       const previousHalls = queryClient.getQueryData(['halls']);
 
-      // Оптимистично удаляем столик из кэша
+      // Оптимистично удаляем столик из кэша (кэш хранит Hall[])
       queryClient.setQueryData(['halls'], (old: any) => {
-        if (!old?.data) return old;
+        if (!old) return old;
 
-        return {
-          ...old,
-          data: old.data.map((hall: any) => {
-            if (!hall.tables) return hall;
+        return old.map((hall: any) => {
+          if (!hall.tables) return hall;
 
-            return {
-              ...hall,
-              tables: hall.tables.filter((table: any) => table.id !== tableId),
-            };
-          }),
-        };
+          return {
+            ...hall,
+            tables: hall.tables.filter((table: any) => table.id !== tableId),
+          };
+        });
       });
 
       return { previousHalls };
@@ -281,8 +310,7 @@ export const useDeleteTable = () => {
       toast.error(`Ошибка: ${error.message}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tables'] });
-      queryClient.invalidateQueries({ queryKey: ['halls'] });
+      // Оптимистичное удаление уже выполнено в onMutate, просто показываем toast
       toast.success('Столик удалён');
     },
   });

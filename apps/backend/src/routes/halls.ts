@@ -1,9 +1,24 @@
 import { Router } from 'express';
 import { prisma } from '../utils/prisma';
 import { validateRequest } from '../middleware/validateRequest';
-import { CreateHallDto, UpdateHallDto } from '@hostes/shared';
+import { CreateHallDto, UpdateHallDto, Wall } from '@hostes/shared';
 
 const router = Router();
+
+// Функция для нормализации walls - добавляет wallType: 'wall' если он отсутствует
+const normalizeWalls = (walls: any[]): Wall[] => {
+  if (!Array.isArray(walls)) return [];
+
+  return walls.map(wall => {
+    // Проверяем, что wallType существует и не пустой
+    const wallType = wall.wallType && wall.wallType.trim() !== '' ? wall.wallType : 'wall';
+
+    return {
+      ...wall,
+      wallType: wallType,
+    };
+  });
+};
 
 // GET /api/halls - Get all halls
 router.get('/', async (req, res, next) => {
@@ -20,7 +35,7 @@ router.get('/', async (req, res, next) => {
     const formattedHalls = halls.map(hall => ({
       ...hall,
       sections: hall.sections as any,
-      walls: hall.walls as any,
+      walls: normalizeWalls(hall.walls as any),
       tables: hall.tables.map(table => ({
         id: table.id,
         number: table.number,
@@ -67,7 +82,7 @@ router.get('/:id', async (req, res, next) => {
     const formattedHall = {
       ...hall,
       sections: hall.sections as any,
-      walls: hall.walls as any,
+      walls: normalizeWalls(hall.walls as any),
       tables: hall.tables.map(table => ({
         id: table.id,
         number: table.number,
@@ -113,7 +128,7 @@ router.post('/', validateRequest(CreateHallDto), async (req, res, next) => {
       data: {
         ...hall,
         sections: hall.sections as any,
-        walls: hall.walls as any,
+        walls: normalizeWalls(hall.walls as any),
         tables: [],
       },
     });
@@ -131,12 +146,12 @@ router.patch('/:id', validateRequest(UpdateHallDto), async (req, res, next) => {
     const hall = await prisma.hall.update({
       where: { id },
       data: {
-        ...(data.name && { name: data.name }),
-        ...(data.width && { width: data.width }),
-        ...(data.height && { height: data.height }),
-        ...(data.pixelRatio && { pixelRatio: data.pixelRatio }),
-        ...(data.sections && { sections: data.sections }),
-        ...(data.walls && { walls: data.walls }),
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.width !== undefined && { width: data.width }),
+        ...(data.height !== undefined && { height: data.height }),
+        ...(data.pixelRatio !== undefined && { pixelRatio: data.pixelRatio }),
+        ...(data.sections !== undefined && { sections: data.sections }),
+        ...(data.walls !== undefined && { walls: data.walls }),
       },
       include: {
         tables: true,
@@ -146,7 +161,7 @@ router.patch('/:id', validateRequest(UpdateHallDto), async (req, res, next) => {
     const formattedHall = {
       ...hall,
       sections: hall.sections as any,
-      walls: hall.walls as any,
+      walls: normalizeWalls(hall.walls as any),
       tables: hall.tables.map(table => ({
         id: table.id,
         number: table.number,

@@ -27,11 +27,11 @@ const WallLine = ({
   let strokeWidth = 6;
   let strokeDasharray: string | 'none' = 'none';
 
-  if (wall.type === 'window') {
+  if (wall.wallType === 'window') {
     stroke = theme.colors.primary[500];
     strokeWidth = 4;
     strokeDasharray = '10 5';
-  } else if (wall.type === 'entrance') {
+  } else if (wall.wallType === 'entrance') {
     stroke = theme.colors.success[500];
     strokeWidth = 8;
     strokeDasharray = 'none';
