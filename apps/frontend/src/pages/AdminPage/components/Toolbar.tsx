@@ -3,7 +3,7 @@ import { theme } from '@/styles/theme';
 import { Square, Circle } from 'lucide-react';
 
 export type TableShape = 'rectangle' | 'circle' | 'oval';
-export type ToolMode = 'select' | 'add-table' | 'add-wall';
+export type ToolMode = 'select' | 'add-table' | 'add-wall' | 'add-window' | 'add-entrance';
 
 interface ToolbarProps {
   mode: ToolMode;
@@ -40,6 +40,14 @@ export const Toolbar = ({
           <ToolButton $active={mode === 'add-wall'} onClick={() => onModeChange('add-wall')}>
             <span>🧱</span>
             <span>Стена</span>
+          </ToolButton>
+          <ToolButton $active={mode === 'add-window'} onClick={() => onModeChange('add-window')}>
+            <span>🪟</span>
+            <span>Окно</span>
+          </ToolButton>
+          <ToolButton $active={mode === 'add-entrance'} onClick={() => onModeChange('add-entrance')}>
+            <span>🚪</span>
+            <span>Вход</span>
           </ToolButton>
         </ToolButtons>
       </Section>

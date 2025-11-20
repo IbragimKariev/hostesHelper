@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { BookingTableItem } from './BookingTableItem';
-import type { Hall, Reservation } from '@hostes/shared';
+import type { Hall, Reservation, Wall } from '@hostes/shared';
 
 interface BookingHallCanvasProps {
   hall: Hall;
@@ -9,6 +9,47 @@ interface BookingHallCanvasProps {
   selectedDate: string;
   onTableClick: (tableId: string) => void;
 }
+
+// Компонент для отрисовки стены/окна/входа
+const WallLine = ({
+  wall,
+  pixelRatio,
+}: {
+  wall: Wall;
+  pixelRatio: number;
+}) => {
+  const x1 = wall.start.x * pixelRatio;
+  const y1 = wall.start.y * pixelRatio;
+  const x2 = wall.end.x * pixelRatio;
+  const y2 = wall.end.y * pixelRatio;
+
+  let stroke = theme.colors.gray[800];
+  let strokeWidth = 6;
+  let strokeDasharray = 'none';
+
+  if (wall.type === 'window') {
+    stroke = theme.colors.primary[500];
+    strokeWidth = 4;
+    strokeDasharray = '10 5';
+  } else if (wall.type === 'entrance') {
+    stroke = theme.colors.success[500];
+    strokeWidth = 8;
+    strokeDasharray = 'none';
+  }
+
+  return (
+    <line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      strokeDasharray={strokeDasharray}
+      strokeLinecap="round"
+    />
+  );
+};
 
 export const BookingHallCanvas = ({
   hall,
@@ -47,6 +88,17 @@ export const BookingHallCanvas = ({
       >
         <Grid $pixelRatio={hall.pixelRatio} />
 
+        {/* Стены, окна, входы */}
+        <svg
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}
+          width={hall.width * hall.pixelRatio}
+          height={hall.height * hall.pixelRatio}
+        >
+          {hall.walls?.map((wall) => (
+            <WallLine key={wall.id} wall={wall} pixelRatio={hall.pixelRatio} />
+          ))}
+        </svg>
+
         {tables.map((table) => (
           <BookingTableItem
             key={table.id}
@@ -67,6 +119,19 @@ export const BookingHallCanvas = ({
         <LegendItem>
           <LegendColor $color={theme.colors.gray[500]} />
           <LegendText>Забронирован</LegendText>
+        </LegendItem>
+        <LegendDivider />
+        <LegendItem>
+          <WallLegendLine $color={theme.colors.gray[800]} />
+          <LegendText>Стена</LegendText>
+        </LegendItem>
+        <LegendItem>
+          <WallLegendLine $color={theme.colors.primary[500]} $dashed />
+          <LegendText>Окно</LegendText>
+        </LegendItem>
+        <LegendItem>
+          <WallLegendLine $color={theme.colors.success[500]} $thick />
+          <LegendText>Вход</LegendText>
         </LegendItem>
       </Legend>
     </Container>
@@ -153,4 +218,24 @@ const LegendColor = styled.div<{ $color: string }>`
 const LegendText = styled.div`
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
+`;
+
+const LegendDivider = styled.div`
+  width: 1px;
+  height: 20px;
+  background: ${theme.colors.divider};
+  margin: 0 ${theme.spacing[2]};
+`;
+
+const WallLegendLine = styled.div<{ $color: string; $dashed?: boolean; $thick?: boolean }>`
+  width: 24px;
+  height: ${(props) => (props.$thick ? '4px' : '2px')};
+  background: ${(props) => props.$color};
+  border-radius: 1px;
+  ${(props) =>
+    props.$dashed &&
+    `
+    background-image: linear-gradient(90deg, ${props.$color} 60%, transparent 60%);
+    background-size: 8px 100%;
+  `}
 `;

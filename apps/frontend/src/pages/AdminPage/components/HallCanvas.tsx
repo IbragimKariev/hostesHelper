@@ -4,14 +4,15 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { TableItem } from './TableItem';
 import { useUpdateTable, useCreateTable, useDeleteTable } from '@/hooks/useTables';
-import type { Hall, Table, CreateTableDto, UpdateTableDto } from '@hostes/shared';
+import { useUpdateHall } from '@/hooks/useHalls';
+import type { Hall, Table, CreateTableDto, UpdateTableDto, Wall, WallType } from '@hostes/shared';
 import { Trash2, Copy, Edit } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { EditTableModal } from './EditTableModal';
 
 interface HallCanvasProps {
   hall: Hall;
-  mode: 'select' | 'add-table' | 'add-wall';
+  mode: 'select' | 'add-table' | 'add-wall' | 'add-window' | 'add-entrance';
   newTableConfig: {
     shape: 'rectangle' | 'circle' | 'oval';
     seats: number;
@@ -29,17 +30,80 @@ const DragMonitor = ({ onDragStart }: { onDragStart: (table: Table) => void }) =
   return null;
 };
 
+// Компонент для отрисовки стены/окна/входа
+const WallLine = ({
+  wall,
+  pixelRatio,
+  onDoubleClick,
+}: {
+  wall: Wall;
+  pixelRatio: number;
+  onDoubleClick: () => void;
+}) => {
+  const x1 = wall.start.x * pixelRatio;
+  const y1 = wall.start.y * pixelRatio;
+  const x2 = wall.end.x * pixelRatio;
+  const y2 = wall.end.y * pixelRatio;
+
+  let stroke = theme.colors.gray[800];
+  let strokeWidth = 6;
+  let strokeDasharray = 'none';
+
+  if (wall.type === 'window') {
+    stroke = theme.colors.primary[500];
+    strokeWidth = 4;
+    strokeDasharray = '10 5';
+  } else if (wall.type === 'entrance') {
+    stroke = theme.colors.success[500];
+    strokeWidth = 8;
+    strokeDasharray = 'none';
+  }
+
+  return (
+    <line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      strokeDasharray={strokeDasharray}
+      strokeLinecap="round"
+      style={{ pointerEvents: 'all', cursor: 'pointer' }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onDoubleClick();
+      }}
+    />
+  );
+};
+
 export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [draggedTable, setDraggedTable] = useState<Table | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [optimisticPositions, setOptimisticPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [drawingWall, setDrawingWall] = useState<{ start: { x: number; y: number } } | null>(null);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
 
   const updateTable = useUpdateTable({ silent: true });
   const updateTableWithToast = useUpdateTable();
   const createTable = useCreateTable();
   const deleteTable = useDeleteTable();
+  const updateHall = useUpdateHall();
 
   const selectedTable = hall.tables?.find((t) => t.id === selectedTableId);
+
+  // Объединяем реальные столики с оптимистичными позициями
+  const tablesWithOptimisticPositions = hall.tables?.map((table) => {
+    if (optimisticPositions[table.id]) {
+      return {
+        ...table,
+        position: optimisticPositions[table.id],
+      };
+    }
+    return table;
+  });
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event;
@@ -61,24 +125,66 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
         const clampedX = Math.max(0, Math.min(newX, maxX));
         const clampedY = Math.max(0, Math.min(newY, maxY));
 
-        updateTable.mutate({
-          id: table.id,
-          data: {
-            position: { x: clampedX, y: clampedY },
+        // Сразу сохраняем оптимистичную позицию
+        setOptimisticPositions(prev => ({
+          ...prev,
+          [table.id]: { x: clampedX, y: clampedY },
+        }));
+
+        // Отправляем на сервер
+        updateTable.mutate(
+          {
+            id: table.id,
+            data: {
+              position: { x: clampedX, y: clampedY },
+            },
           },
-        });
+          {
+            // После успешного обновления удаляем оптимистичную позицию
+            onSuccess: () => {
+              setOptimisticPositions(prev => {
+                const newPositions = { ...prev };
+                delete newPositions[table.id];
+                return newPositions;
+              });
+            },
+            // При ошибке тоже удаляем (откат произойдёт автоматически)
+            onError: () => {
+              setOptimisticPositions(prev => {
+                const newPositions = { ...prev };
+                delete newPositions[table.id];
+                return newPositions;
+              });
+            },
+          }
+        );
       }
     }
 
     setDraggedTable(null);
   };
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (mode === 'add-table' && e.target === e.currentTarget) {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (e.clientX - rect.left) / hall.pixelRatio;
       const y = (e.clientY - rect.top) / hall.pixelRatio;
+      setMousePosition({ x, y });
+    }
+  };
 
+  const handleMouseLeave = () => {
+    if (mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') {
+      setMousePosition(null);
+    }
+  };
+
+  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / hall.pixelRatio;
+    const y = (e.clientY - rect.top) / hall.pixelRatio;
+
+    if (mode === 'add-table' && e.target === e.currentTarget) {
       // Размер столика в зависимости от количества мест
       const getTableSize = (seats: number) => {
         if (seats <= 2) return { width: 0.8, height: 0.8 };
@@ -103,6 +209,30 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
       };
 
       createTable.mutate(newTable);
+    } else if ((mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') && e.target === e.currentTarget) {
+      // Начинаем или заканчиваем рисование стены
+      if (!drawingWall) {
+        // Начинаем рисование
+        setDrawingWall({ start: { x, y } });
+      } else {
+        // Заканчиваем рисование
+        const wallType: WallType = mode === 'add-wall' ? 'wall' : mode === 'add-window' ? 'window' : 'entrance';
+
+        const newWall: Wall = {
+          id: crypto.randomUUID(),
+          start: drawingWall.start,
+          end: { x, y },
+          type: wallType,
+        };
+
+        const updatedWalls = [...(hall.walls || []), newWall];
+        updateHall.mutate({
+          id: hall.id,
+          data: { walls: updatedWalls },
+        });
+
+        setDrawingWall(null);
+      }
     } else if (mode === 'select' && e.target === e.currentTarget) {
       setSelectedTableId(null);
     }
@@ -113,6 +243,14 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
       deleteTable.mutate(selectedTableId);
       setSelectedTableId(null);
     }
+  };
+
+  const handleDeleteWall = (wallId: string) => {
+    const updatedWalls = (hall.walls || []).filter((w) => w.id !== wallId);
+    updateHall.mutate({
+      id: hall.id,
+      data: { walls: updatedWalls },
+    });
   };
 
   const handleDuplicateTable = () => {
@@ -159,10 +297,66 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
           $width={hall.width * hall.pixelRatio}
           $height={hall.height * hall.pixelRatio}
           onClick={handleCanvasClick}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
           <Grid $pixelRatio={hall.pixelRatio} />
 
-          {hall.tables?.map((table) => (
+          {/* Стены, окна, входы */}
+          <svg
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}
+            width={hall.width * hall.pixelRatio}
+            height={hall.height * hall.pixelRatio}
+          >
+            {hall.walls?.map((wall) => (
+              <WallLine
+                key={wall.id}
+                wall={wall}
+                pixelRatio={hall.pixelRatio}
+                onDoubleClick={() => handleDeleteWall(wall.id)}
+              />
+            ))}
+
+            {/* Предварительная линия во время рисования */}
+            {drawingWall && mousePosition && (
+              <line
+                x1={drawingWall.start.x * hall.pixelRatio}
+                y1={drawingWall.start.y * hall.pixelRatio}
+                x2={mousePosition.x * hall.pixelRatio}
+                y2={mousePosition.y * hall.pixelRatio}
+                stroke={
+                  mode === 'add-wall'
+                    ? theme.colors.gray[800]
+                    : mode === 'add-window'
+                    ? theme.colors.primary[500]
+                    : theme.colors.success[500]
+                }
+                strokeWidth={mode === 'add-entrance' ? 8 : mode === 'add-window' ? 4 : 6}
+                strokeDasharray={mode === 'add-window' ? '10 5' : 'none'}
+                strokeLinecap="round"
+                opacity={0.5}
+              />
+            )}
+
+            {/* Точка начала при рисовании */}
+            {drawingWall && (
+              <circle
+                cx={drawingWall.start.x * hall.pixelRatio}
+                cy={drawingWall.start.y * hall.pixelRatio}
+                r={6}
+                fill={
+                  mode === 'add-wall'
+                    ? theme.colors.gray[800]
+                    : mode === 'add-window'
+                    ? theme.colors.primary[500]
+                    : theme.colors.success[500]
+                }
+                opacity={0.7}
+              />
+            )}
+          </svg>
+
+          {tablesWithOptimisticPositions?.map((table) => (
             <TableItem
               key={table.id}
               table={table}
@@ -243,8 +437,15 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
       <CanvasInfo>
         <InfoItem>Размер зала: {hall.width}×{hall.height} м</InfoItem>
         <InfoItem>Столиков: {hall.tables?.length || 0}</InfoItem>
+        <InfoItem>Стен/окон/входов: {hall.walls?.length || 0}</InfoItem>
         {mode === 'add-table' && <InfoHint>💡 Кликните на холст, чтобы добавить столик</InfoHint>}
-        {mode === 'select' && !selectedTableId && <InfoHint>💡 Кликните на столик для редактирования</InfoHint>}
+        {(mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') && !drawingWall && (
+          <InfoHint>💡 Кликните на холст, чтобы начать линию • Двойной клик для удаления</InfoHint>
+        )}
+        {(mode === 'add-wall' || mode === 'add-window' || mode === 'add-entrance') && drawingWall && (
+          <InfoHint>💡 Кликните ещё раз, чтобы завершить линию</InfoHint>
+        )}
+        {mode === 'select' && !selectedTableId && <InfoHint>💡 Двойной клик на стене/окне/входе для удаления</InfoHint>}
         {mode === 'select' && selectedTableId && <InfoHint>✓ Столик выбран</InfoHint>}
       </CanvasInfo>
 
@@ -275,6 +476,7 @@ const Canvas = styled.div<{ $width: number; $height: number }>`
   border-radius: ${theme.borderRadius.xl};
   overflow: hidden;
   margin: 0 auto;
+  cursor: crosshair;
 `;
 
 const Grid = styled.div<{ $pixelRatio: number }>`

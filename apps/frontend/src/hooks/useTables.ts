@@ -61,7 +61,47 @@ export const useUpdateTable = (options?: { silent?: boolean }) => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTableDto }) =>
       tablesApi.update(id, data),
+    // Оптимистичное обновление - обновляем UI сразу, не дожидаясь ответа сервера
+    onMutate: async ({ id, data }) => {
+      // Отменяем текущие запросы для этих данных
+      await queryClient.cancelQueries({ queryKey: ['halls'] });
+
+      // Сохраняем предыдущее состояние для отката при ошибке
+      const previousHalls = queryClient.getQueryData(['halls']);
+
+      // Оптимистично обновляем кеш
+      queryClient.setQueryData(['halls'], (old: any) => {
+        if (!old?.data) return old;
+
+        return {
+          ...old,
+          data: old.data.map((hall: any) => {
+            if (!hall.tables) return hall;
+
+            return {
+              ...hall,
+              tables: hall.tables.map((table: any) => {
+                if (table.id === id) {
+                  return { ...table, ...data };
+                }
+                return table;
+              }),
+            };
+          }),
+        };
+      });
+
+      return { previousHalls };
+    },
+    onError: (error: Error, _, context) => {
+      // Откатываем изменения при ошибке
+      if (context?.previousHalls) {
+        queryClient.setQueryData(['halls'], context.previousHalls);
+      }
+      toast.error(`Ошибка: ${error.message}`);
+    },
     onSuccess: (data) => {
+      // Обновляем данные после успешного ответа сервера
       queryClient.invalidateQueries({ queryKey: ['tables'] });
       queryClient.invalidateQueries({ queryKey: ['tables', data.id] });
       queryClient.invalidateQueries({ queryKey: ['halls'] });
@@ -71,9 +111,6 @@ export const useUpdateTable = (options?: { silent?: boolean }) => {
       if (!options?.silent) {
         toast.success('Столик обновлён');
       }
-    },
-    onError: (error: Error) => {
-      toast.error(`Ошибка: ${error.message}`);
     },
   });
 };

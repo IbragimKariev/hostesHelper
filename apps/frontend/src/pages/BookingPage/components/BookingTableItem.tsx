@@ -38,6 +38,66 @@ export const BookingTableItem = ({
     height: `${table.size.height * pixelRatio}px`,
   };
 
+  // Расчёт позиций посадочных мест внутри столика
+  const getSeatPositions = () => {
+    const seats: Array<{ x: number; y: number }> = [];
+    const tableWidth = table.size.width * pixelRatio;
+    const tableHeight = table.size.height * pixelRatio;
+    const centerX = tableWidth / 2;
+    const centerY = tableHeight / 2;
+
+    const numSeats = table.seats;
+
+    if (table.shape === 'circle') {
+      // Для круглого столика - по внутренней окружности
+      const radius = (tableWidth / 2) * 0.7; // 70% от радиуса столика
+
+      for (let i = 0; i < numSeats; i++) {
+        const angle = (i / numSeats) * 2 * Math.PI - Math.PI / 2; // Начинаем сверху
+        seats.push({
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle),
+        });
+      }
+    } else {
+      // Для прямоугольных и овальных - по внутреннему периметру
+      const inset = 12; // Отступ от края внутрь
+      const innerWidth = tableWidth - 2 * inset;
+      const innerHeight = tableHeight - 2 * inset;
+      const perimeter = 2 * (innerWidth + innerHeight);
+      const spacing = perimeter / numSeats;
+
+      for (let i = 0; i < numSeats; i++) {
+        const distance = i * spacing;
+        let x, y;
+
+        if (distance < innerWidth) {
+          // Верхняя сторона
+          x = inset + distance;
+          y = inset;
+        } else if (distance < innerWidth + innerHeight) {
+          // Правая сторона
+          x = tableWidth - inset;
+          y = inset + (distance - innerWidth);
+        } else if (distance < 2 * innerWidth + innerHeight) {
+          // Нижняя сторона
+          x = tableWidth - inset - (distance - innerWidth - innerHeight);
+          y = tableHeight - inset;
+        } else {
+          // Левая сторона
+          x = inset;
+          y = tableHeight - inset - (distance - 2 * innerWidth - innerHeight);
+        }
+
+        seats.push({ x, y });
+      }
+    }
+
+    return seats;
+  };
+
+  const seatPositions = getSeatPositions();
+
   return (
     <Container
       style={style}
@@ -48,6 +108,11 @@ export const BookingTableItem = ({
       tabIndex={0}
       aria-label={`Столик номер ${table.number}, ${table.seats} мест, ${isReserved ? 'забронирован' : 'доступен'}`}
     >
+      {/* Посадочные места */}
+      {seatPositions.map((pos, index) => (
+        <Seat key={index} style={{ left: `${pos.x}px`, top: `${pos.y}px` }} />
+      ))}
+
       <TableNumber>{table.number}</TableNumber>
       <TableSeats>{table.seats} мест</TableSeats>
       {isReserved && (
@@ -140,4 +205,23 @@ const ReservationBadge = styled.div`
   border-radius: ${theme.borderRadius.full};
   white-space: nowrap;
   box-shadow: ${theme.shadows.sm};
+`;
+
+const Seat = styled.div`
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: ${theme.colors.gray[400]};
+  opacity: 0.3;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  transition: all ${theme.transitions.fast};
+
+  ${Container}:hover & {
+    background: ${theme.colors.success[400]};
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
 `;

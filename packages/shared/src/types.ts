@@ -35,10 +35,14 @@ export const Section = z.object({
 export type Section = z.infer<typeof Section>;
 
 // ===== WALL =====
+export const WallType = z.enum(['wall', 'window', 'entrance']);
+export type WallType = z.infer<typeof WallType>;
+
 export const Wall = z.object({
   id: z.string(),
   start: Position,
   end: Position,
+  type: WallType.default('wall'),
 });
 export type Wall = z.infer<typeof Wall>;
 
