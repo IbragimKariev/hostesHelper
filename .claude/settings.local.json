@@ -32,7 +32,9 @@
       "Bash(set:*)",
       "Bash(npm run db:generate:*)",
       "Bash(npx prisma generate:*)",
-      "Bash(npx prisma migrate:*)"
+      "Bash(npx prisma migrate:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
