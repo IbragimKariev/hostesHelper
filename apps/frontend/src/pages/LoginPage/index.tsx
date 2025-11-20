@@ -105,6 +105,7 @@ export const LoginPage = () => {
           <p>Учетные данные для теста:</p>
           <p><strong>Админ:</strong> admin / admin123</p>
           <p><strong>Хостес:</strong> hostess / hostess123</p>
+          <p><strong>Хостес:</strong> hostess / hostess123</p>
         </div>
       </div>
     </div>
