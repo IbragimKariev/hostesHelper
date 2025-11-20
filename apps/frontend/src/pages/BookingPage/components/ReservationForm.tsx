@@ -40,10 +40,10 @@ export const ReservationForm = ({
     return `${year}-${month}-${day}`;
   };
 
-  // Функция для преобразования YYYY-MM-DD в DD-MM-YYYY
-  const convertToDDMMYYYY = (dateStr: string): string => {
+  // Функция для преобразования YYYY-MM-DD в Date объект
+  const convertToDate = (dateStr: string): Date => {
     const [year, month, day] = dateStr.split('-');
-    return `${day}-${month}-${year}`;
+    return new Date(`${year}-${month}-${day}`);
   };
 
   const {
@@ -95,7 +95,7 @@ export const ReservationForm = ({
 
     const [startHour, startMinute] = selectedTime.split(':').map(Number);
     const startTimeMinutes = startHour * 60 + startMinute;
-    const endTimeMinutes = startTimeMinutes + parseFloat(selectedDuration) * 60;
+    const endTimeMinutes = startTimeMinutes + Number(selectedDuration) * 60;
 
     const conflicts = (allReservations || []).filter((r) => {
       if (reservation && r.id === reservation.id) return false;
@@ -132,7 +132,7 @@ export const ReservationForm = ({
         customerName: data.customerName,
         customerPhone: data.customerPhone,
         guests: parseInt(data.guests),
-        date: convertToDDMMYYYY(data.date), // Преобразуем YYYY-MM-DD в DD-MM-YYYY для отправки
+        date: convertToDate(data.date), // Преобразуем YYYY-MM-DD в Date объект
         time: data.time,
         duration: parseFloat(data.duration),
         status: data.status,

@@ -22,7 +22,7 @@ export const BookingTableItem = ({
   const tableReservations = reservations.filter((r) => {
     return (
       r.tableId === table.id &&
-      r.date === selectedDate &&
+      new Date(r.date).toISOString().split('T')[0] === selectedDate &&
       (r.status === 'confirmed' || r.status === 'pending')
     );
   });

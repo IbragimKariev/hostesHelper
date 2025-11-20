@@ -34,7 +34,9 @@
       "Bash(npx prisma generate:*)",
       "Bash(npx prisma migrate:*)",
       "Bash(npx prisma migrate dev:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

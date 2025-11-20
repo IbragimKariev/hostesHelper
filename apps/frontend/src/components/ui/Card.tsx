@@ -3,7 +3,7 @@ import styles from './Card.module.css';
 
 interface CardProps {
   children: ReactNode;
-  padding?: '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10';
+  padding?: 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10';
   hoverable?: boolean;
   onClick?: () => void;
   className?: string;
