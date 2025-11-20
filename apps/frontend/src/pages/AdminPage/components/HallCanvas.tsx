@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, useDndMonitor } from '@dnd-kit/core';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { v4 as uuidv4 } from 'uuid';
+import { generateUUID } from '@/utils/uuid';
 import { TableItem } from './TableItem';
 import { useUpdateTable, useCreateTable, useDeleteTable } from '@/hooks/useTables';
 import { useUpdateHall } from '@/hooks/useHalls';
@@ -225,7 +225,7 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
           const wallType: WallType = mode === 'add-wall' ? 'wall' : mode === 'add-window' ? 'window' : 'entrance';
 
           const newWall: Wall = {
-            id: uuidv4(),
+            id: generateUUID(),
             start: drawingWall.start,
             end: { x, y },
             type: wallType,

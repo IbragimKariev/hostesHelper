@@ -1,0 +1,20 @@
+/**
+ * Генерация UUID с фоллбэком для старых браузеров или HTTP
+ */
+export function generateUUID(): string {
+  // Пробуем использовать встроенный crypto.randomUUID (только HTTPS или localhost)
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    try {
+      return crypto.randomUUID();
+    } catch (e) {
+      // Если не работает, используем фоллбэк
+    }
+  }
+
+  // Фоллбэк: генерируем UUID вручную (RFC4122 версия 4)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
