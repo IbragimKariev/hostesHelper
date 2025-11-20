@@ -45,9 +45,9 @@ const WallLine = ({
   const x2 = wall.end.x * pixelRatio;
   const y2 = wall.end.y * pixelRatio;
 
-  let stroke = theme.colors.gray[800];
+  let stroke: string = theme.colors.gray[800];
   let strokeWidth = 6;
-  let strokeDasharray = 'none';
+  let strokeDasharray: string | 'none' = 'none';
 
   if (wall.type === 'window') {
     stroke = theme.colors.primary[500];
