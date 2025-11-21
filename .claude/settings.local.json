@@ -12,7 +12,18 @@
       "Bash(node test-normalize.js:*)",
       "Bash(del test-normalize.js)",
       "Bash(npm run check:api-response:*)",
-      "Bash(npm run add:test-walls:*)"
+      "Bash(npm run add:test-walls:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(dir:*)",
+      "Bash(npm run dev:backend:*)",
+      "Bash(taskkill:*)",
+      "Bash(nul)",
+      "Bash(npx tsx:*)",
+      "Bash(del appsbackendsrcscriptscheck-wall-data.ts)",
+      "Bash(del appsbackendsrcscriptstest-window-fix.ts)",
+      "Bash(node src/scripts/test-normalize.js:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
