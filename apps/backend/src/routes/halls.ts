@@ -5,16 +5,22 @@ import { CreateHallDto, UpdateHallDto, Wall } from '@hostes/shared';
 
 const router = Router();
 
-// Функция для нормализации walls - добавляет wallType: 'wall' если он отсутствует
+// Функция для нормализации walls - обеспечивает наличие wallType
 const normalizeWalls = (walls: any[]): Wall[] => {
   if (!Array.isArray(walls)) return [];
 
   return walls.map(wall => {
-    // Проверяем, что wallType существует и не пустой
-    const wallType = wall.wallType && wall.wallType.trim() !== '' ? wall.wallType : 'wall';
+    // Определяем wallType:
+    // 1. Если есть wallType - используем его
+    // 2. Если нет wallType, но есть старое поле type - используем его (для обратной совместимости)
+    // 3. Если ничего нет - по умолчанию 'wall'
+    const wallType = wall.wallType || wall.type || 'wall';
+
+    // Убираем старое поле type если оно есть
+    const { type, ...wallWithoutType } = wall;
 
     return {
-      ...wall,
+      ...wallWithoutType,
       wallType: wallType,
     };
   });

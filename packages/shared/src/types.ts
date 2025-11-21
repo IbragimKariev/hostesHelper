@@ -42,7 +42,7 @@ export const Wall = z.object({
   id: z.string(),
   start: Position,
   end: Position,
-  wallType: WallType.default('wall'), // Переименовано из 'type' т.к. 'type' - зарезервированное слово в PostgreSQL
+  wallType: WallType, // Переименовано из 'type' т.к. 'type' - зарезервированное слово в PostgreSQL
 });
 export type Wall = z.infer<typeof Wall>;
 
