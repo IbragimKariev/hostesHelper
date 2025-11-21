@@ -116,7 +116,7 @@
 }
 
 .reservationsList {
-  width: 50%;
+  width: 40%;
   min-width: 320px;
 }
 
@@ -279,7 +279,7 @@
 }
 
 .hallBar {
-  width: 50%;
+  width: 60%;
   flex: 1;
 }
 

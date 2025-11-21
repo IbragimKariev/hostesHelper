@@ -306,7 +306,7 @@ export const HallCanvas = ({ hall, mode, newTableConfig }: HallCanvasProps) => {
   };
 
   return (
-    <Container>
+    <Container >
       <DndContext onDragEnd={handleDragEnd}>
         <DragMonitor onDragStart={setDraggedTable} />
         <Canvas

@@ -142,6 +142,7 @@ export const BookingHallCanvas = ({
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  overflow: scroll;
   gap: ${theme.spacing[4]};
 `;
 

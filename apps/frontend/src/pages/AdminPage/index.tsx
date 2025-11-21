@@ -118,9 +118,7 @@ export const AdminPage = () => {
                                     }`}
                                     onClick={() => setSelectedHallId(hall.id)}
                                 >
-                                    <div className={styles.hallIcon}>
-                                        <Grid3x3 size={24} />
-                                    </div>
+                                    
 
                                     <div className={styles.hallInfo}>
                                         <div className={styles.hallName}>
@@ -178,7 +176,8 @@ export const AdminPage = () => {
                 {/* Main content */}
                 <div className={styles.mainContent}>
                     {selectedHall ? (
-                        <Card padding={6}>
+                        <div className={styles.mainContentt}>
+                        <Card padding={6} >
                             <CardHeader
                                 title={selectedHall.name}
                                 subtitle={`Размер: ${selectedHall.width}×${selectedHall.height} метров`}
@@ -195,7 +194,7 @@ export const AdminPage = () => {
                                 }
                             />
 
-                            <div className={styles.canvasWrapper}>
+                            <div className={styles.canvasWrapper} >
                                 <HallCanvas
                                     hall={selectedHall}
                                     mode={toolMode}
@@ -209,7 +208,7 @@ export const AdminPage = () => {
                             <div className={styles.stats}>
                                 <div className={styles.statCard}>
                                     <div className={styles.statLabel}>
-                                        Столиков
+                                        Столиков: 
                                     </div>
                                     <div className={styles.statValue}>
                                         {selectedHall.tables?.length || 0}
@@ -218,7 +217,7 @@ export const AdminPage = () => {
 
                                 <div className={styles.statCard}>
                                     <div className={styles.statLabel}>
-                                        Секций
+                                        Секций: 
                                     </div>
                                     <div className={styles.statValue}>
                                         {selectedHall.sections?.length || 0}
@@ -227,7 +226,7 @@ export const AdminPage = () => {
 
                                 <div className={styles.statCard}>
                                     <div className={styles.statLabel}>
-                                        Всего мест
+                                        Всего мест: 
                                     </div>
                                     <div className={styles.statValue}>
                                         {selectedHall.tables?.reduce(
@@ -238,6 +237,7 @@ export const AdminPage = () => {
                                 </div>
                             </div>
                         </Card>
+                        </div>
                     ) : (
                         <div className={styles.emptyState}>
                             <div className={styles.emptyIcon}>🏛️</div>

@@ -5,7 +5,23 @@
   gap: 24px;
   height: calc(100vh - 64px - 24px * 2);
 }
-
+.statCard{
+  display: flex;
+}
+.mainContent{
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+.mainContentt{
+  overflow: scroll;
+  display: block;
+  width: 100%;
+}
+.statValue{
+  font-weight: 500;
+  margin-left: 10px;
+}
 @media (max-width: 1024px) {
   .container {
     height: auto;
@@ -101,8 +117,11 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
+  
 }
-
+.hallCard:not(:last-child){
+  border-bottom: 1px solid #dbeafe;
+}
 .hallCard.active {
   background: #eff6ff;
   border-color: #bfdbfe;

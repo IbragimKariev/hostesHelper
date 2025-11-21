@@ -307,7 +307,7 @@ export const BookingPage = () => {
 
                 {/* RIGHT SIDE — hall */}
                 <div className={styles.hallBar}>
-                    <Card>
+                    <Card >
                         {selectedHall ? (
                             <BookingHallCanvas
                                 hall={selectedHall}
