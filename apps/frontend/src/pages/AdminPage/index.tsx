@@ -8,7 +8,7 @@ import {
     useDeleteHall,
     useUpdateHall,
 } from '@/hooks/useHalls';
-import { Plus, Trash2, Edit, Grid3x3 } from 'lucide-react';
+import { Plus, Trash2, Edit } from 'lucide-react';
 
 import { Toolbar, type ToolMode, type TableShape } from './components/Toolbar';
 import { HallCanvas } from './components/HallCanvas';
