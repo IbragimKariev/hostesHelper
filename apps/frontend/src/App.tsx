@@ -429,7 +429,7 @@ const MobileMenu = styled.div<{ $isOpen: boolean }>`
   background: white;
   box-shadow: ${theme.shadows.xl};
   transform: translateX(${(props) => (props.$isOpen ? '0' : '100%')});
-  transition: transform ${theme.transitions.normal};
+  transition: transform ${theme.transitions.base};
   z-index: ${theme.zIndex.modal};
   overflow-y: auto;
 
