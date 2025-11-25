@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #9333ea 100%);
   padding: 16px;
 }
 
@@ -74,8 +74,8 @@
 
 .input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
 .input.error {
@@ -94,7 +94,7 @@
 
 .submitButton {
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #9333ea 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -107,11 +107,13 @@
   justify-content: center;
   gap: 8px;
   margin-top: 8px;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
 }
 
 .submitButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+  background: linear-gradient(135deg, #0369a1 0%, #7e22ce 100%);
 }
 
 .submitButton:active {

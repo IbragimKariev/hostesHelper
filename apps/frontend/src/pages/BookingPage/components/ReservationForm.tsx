@@ -260,13 +260,13 @@ export const ReservationForm = ({
           <Input
             label="Телефон"
             type="tel"
-            placeholder="+7 (900) 123-45-67"
+            placeholder="+996 (555) 123-456"
             error={errors.customerPhone?.message}
             {...register('customerPhone', {
               required: 'Введите телефон',
               pattern: {
-                value: /^[\d\s\+\-\(\)]+$/,
-                message: 'Неверный формат телефона',
+                value: /^(\+996|996|0)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{3}$/,
+                message: 'Неверный формат телефона. Пример: +996 (555) 123-456',
               },
             })}
           />

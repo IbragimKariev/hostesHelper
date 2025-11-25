@@ -245,11 +245,6 @@ const DishesSection = () => {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
             <Input
-              label="Описание"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-            <Input
               label="Цена"
               type="number"
               value={formData.price}
@@ -261,6 +256,15 @@ const DishesSection = () => {
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             />
           </FormGrid>
+          <TextAreaWrapper>
+            <label>Описание</label>
+            <TextArea
+              rows={3}
+              placeholder="Введите описание блюда..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </TextAreaWrapper>
           <FormActions>
             <Button variant="outline" onClick={() => setShowForm(false)}>Отмена</Button>
             <Button onClick={handleSubmit} disabled={!formData.name.trim()}>Добавить</Button>
@@ -274,7 +278,7 @@ const DishesSection = () => {
             <ItemInfo>
               <ItemName>{item.name}</ItemName>
               {item.description && <ItemReason>{item.description}</ItemReason>}
-              {item.price && <ItemPrice>{item.price} ₽</ItemPrice>}
+              {item.price && <ItemPrice>{item.price} сом</ItemPrice>}
               {item.category && <ItemCategory>{item.category}</ItemCategory>}
             </ItemInfo>
             <ItemActions>
@@ -417,21 +421,37 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: ${theme.spacing[6]};
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[4]};
+  }
 `;
 
 const Header = styled.div`
   margin-bottom: ${theme.spacing[6]};
+
+  @media (max-width: 768px) {
+    margin-bottom: ${theme.spacing[4]};
+  }
 `;
 
 const Title = styled.h1`
   font-size: ${theme.typography.fontSize['3xl']};
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.text.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize['2xl']};
+  }
 `;
 
 const Subtitle = styled.p`
   color: ${theme.colors.text.secondary};
   margin-top: ${theme.spacing[2]};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize.sm};
+  }
 `;
 
 const Tabs = styled.div`
@@ -440,6 +460,12 @@ const Tabs = styled.div`
   margin-bottom: ${theme.spacing[6]};
   border-bottom: 1px solid ${theme.colors.border};
   padding-bottom: ${theme.spacing[2]};
+  overflow-x: auto;
+
+  @media (max-width: 768px) {
+    margin-bottom: ${theme.spacing[4]};
+    gap: ${theme.spacing[1]};
+  }
 `;
 
 const TabButton = styled.button<{ $active: boolean }>`
@@ -454,9 +480,15 @@ const TabButton = styled.button<{ $active: boolean }>`
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
   transition: all ${theme.transitions.fast};
+  white-space: nowrap;
 
   &:hover {
     background: ${({ $active }) => $active ? theme.colors.primary[100] : theme.colors.gray[100]};
+  }
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    font-size: ${theme.typography.fontSize.sm};
   }
 `;
 
@@ -469,6 +501,12 @@ const SectionHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const SectionTitle = styled.h2`
@@ -477,24 +515,42 @@ const SectionTitle = styled.h2`
   gap: ${theme.spacing[2]};
   font-size: ${theme.typography.fontSize.xl};
   font-weight: ${theme.typography.fontWeight.semibold};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize.lg};
+  }
 `;
 
 const FormCard = styled(Card)`
   padding: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[4]};
   background: ${theme.colors.gray[50]};
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[3]};
+  }
 `;
 
 const FormTitle = styled.h3`
   font-size: ${theme.typography.fontSize.lg};
   font-weight: ${theme.typography.fontWeight.semibold};
   margin-bottom: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize.base};
+    margin-bottom: ${theme.spacing[3]};
+  }
 `;
 
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const FormActions = styled.div`
@@ -502,6 +558,14 @@ const FormActions = styled.div`
   justify-content: flex-end;
   gap: ${theme.spacing[2]};
   margin-top: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
 `;
 
 const ItemsList = styled.div`
@@ -517,6 +581,13 @@ const ItemCard = styled(Card)<{ $inactive?: boolean }>`
   align-items: center;
   opacity: ${({ $inactive }) => $inactive ? 0.6 : 1};
   background: ${({ $inactive }) => $inactive ? theme.colors.gray[100] : 'white'};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[3]};
+  }
 `;
 
 const ItemInfo = styled.div`
@@ -554,6 +625,11 @@ const ItemPrice = styled.span`
 const ItemActions = styled.div`
   display: flex;
   gap: ${theme.spacing[2]};
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
 `;
 
 const IconButton = styled.button`

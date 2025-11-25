@@ -20,24 +20,27 @@
 }
 
 .button:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #0284c7;
   outline-offset: 2px;
 }
 
 /* Variants */
 .primary {
-  background: #2563eb;
+  background: linear-gradient(135deg, #0284c7, #9333ea);
   color: white;
-  border-color: #2563eb;
+  border-color: transparent;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
 }
 
 .primary:hover:not(:disabled) {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: linear-gradient(135deg, #0369a1, #7e22ce);
+  box-shadow: 0 4px 8px rgba(2, 132, 199, 0.3);
+  transform: translateY(-1px);
 }
 
 .primary:active:not(:disabled) {
-  background: #1e40af;
+  background: linear-gradient(135deg, #075985, #6b21a8);
+  transform: translateY(0);
 }
 
 .secondary {
@@ -57,16 +60,17 @@
 
 .outline {
   background: transparent;
-  color: #2563eb;
-  border-color: #2563eb;
+  color: #0284c7;
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #0284c7, #9333ea) 1;
 }
 
 .outline:hover:not(:disabled) {
-  background: #eff6ff;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(147, 51, 234, 0.1));
 }
 
 .outline:active:not(:disabled) {
-  background: #dbeafe;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.2), rgba(147, 51, 234, 0.2));
 }
 
 .ghost {

@@ -92,7 +92,7 @@ export const StaffDashboardPage = () => {
                   <DishItem key={dish.id}>
                     <DishName>{dish.name}</DishName>
                     {dish.description && <DishDescription>{dish.description}</DishDescription>}
-                    {dish.price && <DishPrice>{dish.price} ₽</DishPrice>}
+                    {dish.price && <DishPrice>{dish.price} сом</DishPrice>}
                     {dish.category && <DishCategory>{dish.category}</DishCategory>}
                   </DishItem>
                 ))}
@@ -148,6 +148,10 @@ const Container = styled.div`
   min-height: 100vh;
   background: ${theme.colors.gray[50]};
   padding: ${theme.spacing[6]};
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[4]};
+  }
 `;
 
 const LoadingWrapper = styled.div`
@@ -159,6 +163,10 @@ const LoadingWrapper = styled.div`
 
 const Header = styled.div`
   margin-bottom: ${theme.spacing[6]};
+
+  @media (max-width: 768px) {
+    margin-bottom: ${theme.spacing[4]};
+  }
 `;
 
 const HeaderTop = styled.div`
@@ -167,12 +175,20 @@ const HeaderTop = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const Title = styled.h1`
   font-size: ${theme.typography.fontSize['3xl']};
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.text.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize['2xl']};
+  }
 `;
 
 const DateBadge = styled.div`
@@ -185,6 +201,13 @@ const DateBadge = styled.div`
   color: ${theme.colors.text.secondary};
   font-size: ${theme.typography.fontSize.sm};
   box-shadow: ${theme.shadows.sm};
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    font-size: ${theme.typography.fontSize.xs};
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  }
 `;
 
 const Grid = styled.div`
@@ -224,6 +247,11 @@ const CardHeader = styled.div`
   padding: ${theme.spacing[4]} ${theme.spacing[5]};
   background: ${theme.colors.gray[50]};
   border-bottom: 1px solid ${theme.colors.border};
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    gap: ${theme.spacing[2]};
+  }
 `;
 
 const CardIcon = styled.div<{ $color: string }>`
@@ -235,6 +263,16 @@ const CardIcon = styled.div<{ $color: string }>`
   background: ${({ $color }) => $color}15;
   color: ${({ $color }) => $color};
   border-radius: ${theme.borderRadius.lg};
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 `;
 
 const CardTitle = styled.h2`
@@ -242,6 +280,10 @@ const CardTitle = styled.h2`
   font-size: ${theme.typography.fontSize.lg};
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
+
+  @media (max-width: 768px) {
+    font-size: ${theme.typography.fontSize.base};
+  }
 `;
 
 const CountBadge = styled.span<{ $variant: 'error' | 'success' }>`
@@ -257,10 +299,20 @@ const CountBadge = styled.span<{ $variant: 'error' | 'success' }>`
   background: ${({ $variant }) =>
     $variant === 'error' ? theme.colors.error[500] : theme.colors.success[500]};
   color: white;
+
+  @media (max-width: 768px) {
+    min-width: 20px;
+    height: 20px;
+    font-size: ${theme.typography.fontSize.xs};
+  }
 `;
 
 const CardContent = styled.div`
   padding: ${theme.spacing[5]};
+
+  @media (max-width: 768px) {
+    padding: ${theme.spacing[4]};
+  }
 `;
 
 const EmptyState = styled.div`
@@ -363,6 +415,11 @@ const RulesList = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: ${theme.spacing[4]};
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const RuleItem = styled.div<{ $priority: number }>`

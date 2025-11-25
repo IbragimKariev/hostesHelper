@@ -27,6 +27,15 @@ export const GlobalStyles = createGlobalStyle`
     min-height: 100vh;
   }
 
+  /* Prevent scroll when mobile menu is open */
+  body.menu-open {
+    overflow: hidden;
+
+    @media (min-width: 769px) {
+      overflow: auto;
+    }
+  }
+
   /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 8px;
