@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-r
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { GlobalStyles } from '@/styles/GlobalStyles';
-import { LayoutGrid, Calendar, Users, LogOut } from 'lucide-react';
+import { LayoutGrid, Calendar, Users, LogOut, Utensils, Briefcase } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
@@ -12,6 +12,8 @@ import { AdminPage } from '@/pages/AdminPage';
 import { BookingPage } from '@/pages/BookingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { UsersPage } from '@/pages/UsersPage';
+import MenuManagementPage from '@/pages/MenuManagementPage';
+import StaffDashboardPage from '@/pages/StaffDashboardPage';
 
 const App = () => {
   const location = useLocation();
@@ -55,11 +57,19 @@ const App = () => {
                   <Calendar size={20} />
                   <span>Бронирование</span>
                 </NavLink>
+                <NavLink to="/staff" $active={location.pathname === '/staff'}>
+                  <Briefcase size={20} />
+                  <span>Для официантов</span>
+                </NavLink>
                 {isAdmin && (
                   <>
                     <NavLink to="/admin" $active={location.pathname === '/admin'}>
                       <LayoutGrid size={20} />
                       <span>Дизайн залов</span>
+                    </NavLink>
+                    <NavLink to="/menu" $active={location.pathname === '/menu'}>
+                      <Utensils size={20} />
+                      <span>Управление меню</span>
                     </NavLink>
                     <NavLink to="/users" $active={location.pathname === '/users'}>
                       <Users size={20} />
@@ -97,6 +107,15 @@ const App = () => {
               }
             />
             <Route path="/booking" element={<BookingPage />} />
+            <Route path="/staff" element={<StaffDashboardPage />} />
+            <Route
+              path="/menu"
+              element={
+                <ProtectedRoute adminOnly>
+                  <MenuManagementPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/users"
               element={
