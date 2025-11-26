@@ -159,6 +159,7 @@ const StoplistSection = () => {
                 <ItemInfo>
                   <ItemName>{item.name}</ItemName>
                   {item.reason && <ItemReason>{item.reason}</ItemReason>}
+                  {item.date && <ItemDate>Дата: {new Date(item.date).toLocaleDateString('ru-RU')}</ItemDate>}
                   {item.category && <ItemCategory>{item.category}</ItemCategory>}
                 </ItemInfo>
                 <ItemActions>
@@ -275,19 +276,59 @@ const DishesSection = () => {
       <ItemsList>
         {items?.map((item) => (
           <ItemCard key={item.id} $inactive={!item.isActive}>
-            <ItemInfo>
-              <ItemName>{item.name}</ItemName>
-              {item.description && <ItemReason>{item.description}</ItemReason>}
-              {item.price && <ItemPrice>{item.price} сом</ItemPrice>}
-              {item.category && <ItemCategory>{item.category}</ItemCategory>}
-            </ItemInfo>
-            <ItemActions>
-              <IconButton onClick={() => updateItem.mutate({ id: item.id, data: { isActive: !item.isActive } })}>
-                {item.isActive ? <Check size={16} color={theme.colors.success[500]} /> : <X size={16} color={theme.colors.gray[400]} />}
-              </IconButton>
-              <IconButton onClick={() => startEdit(item)}><Edit2 size={16} /></IconButton>
-              <IconButton onClick={() => deleteItem.mutate(item.id)}><Trash2 size={16} color={theme.colors.error[500]} /></IconButton>
-            </ItemActions>
+            {editingId === item.id ? (
+              <EditFormFull>
+                <FormGrid>
+                  <Input
+                    label="Название"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                  <Input
+                    label="Цена"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  />
+                  <Input
+                    label="Категория"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="Горячее, Салаты..."
+                  />
+                </FormGrid>
+                <TextAreaWrapper>
+                  <label>Описание</label>
+                  <TextArea
+                    rows={3}
+                    placeholder="Введите описание блюда..."
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  />
+                </TextAreaWrapper>
+                <EditActions>
+                  <IconButton onClick={handleSubmit}><Check size={16} /></IconButton>
+                  <IconButton onClick={() => setEditingId(null)}><X size={16} /></IconButton>
+                </EditActions>
+              </EditFormFull>
+            ) : (
+              <>
+                <ItemInfo>
+                  <ItemName>{item.name}</ItemName>
+                  {item.description && <ItemReason>{item.description}</ItemReason>}
+                  {item.price && <ItemPrice>{item.price} сом</ItemPrice>}
+                  {item.date && <ItemDate>Дата: {new Date(item.date).toLocaleDateString('ru-RU')}</ItemDate>}
+                  {item.category && <ItemCategory>{item.category}</ItemCategory>}
+                </ItemInfo>
+                <ItemActions>
+                  <IconButton onClick={() => updateItem.mutate({ id: item.id, data: { isActive: !item.isActive } })}>
+                    {item.isActive ? <Check size={16} color={theme.colors.success[500]} /> : <X size={16} color={theme.colors.gray[400]} />}
+                  </IconButton>
+                  <IconButton onClick={() => startEdit(item)}><Edit2 size={16} /></IconButton>
+                  <IconButton onClick={() => deleteItem.mutate(item.id)}><Trash2 size={16} color={theme.colors.error[500]} /></IconButton>
+                </ItemActions>
+              </>
+            )}
           </ItemCard>
         ))}
         {items?.length === 0 && <EmptyState>Нет блюд дня</EmptyState>}
@@ -395,19 +436,57 @@ const RulesSection = () => {
       <ItemsList>
         {rules?.map((rule) => (
           <RuleCard key={rule.id} $inactive={!rule.isActive}>
-            <RuleHeader>
-              <RuleTitle>{rule.title}</RuleTitle>
-              {rule.priority > 0 && <PriorityBadge>Приоритет: {rule.priority}</PriorityBadge>}
-            </RuleHeader>
-            <RuleContent>{rule.content}</RuleContent>
-            {rule.category && <ItemCategory>{rule.category}</ItemCategory>}
-            <ItemActions>
-              <IconButton onClick={() => updateRule.mutate({ id: rule.id, data: { isActive: !rule.isActive } })}>
-                {rule.isActive ? <Check size={16} color={theme.colors.success[500]} /> : <X size={16} color={theme.colors.gray[400]} />}
-              </IconButton>
-              <IconButton onClick={() => startEdit(rule)}><Edit2 size={16} /></IconButton>
-              <IconButton onClick={() => deleteRule.mutate(rule.id)}><Trash2 size={16} color={theme.colors.error[500]} /></IconButton>
-            </ItemActions>
+            {editingId === rule.id ? (
+              <EditFormFull>
+                <FormGrid>
+                  <Input
+                    label="Заголовок"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
+                  <Input
+                    label="Категория"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="Общие, Безопасность..."
+                  />
+                  <Input
+                    label="Приоритет"
+                    type="number"
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  />
+                </FormGrid>
+                <TextAreaWrapper>
+                  <label>Содержание</label>
+                  <TextArea
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    rows={4}
+                  />
+                </TextAreaWrapper>
+                <EditActions>
+                  <IconButton onClick={handleSubmit}><Check size={16} /></IconButton>
+                  <IconButton onClick={() => setEditingId(null)}><X size={16} /></IconButton>
+                </EditActions>
+              </EditFormFull>
+            ) : (
+              <>
+                <RuleHeader>
+                  <RuleTitle>{rule.title}</RuleTitle>
+                  {rule.priority > 0 && <PriorityBadge>Приоритет: {rule.priority}</PriorityBadge>}
+                </RuleHeader>
+                <RuleContent>{rule.content}</RuleContent>
+                {rule.category && <ItemCategory>{rule.category}</ItemCategory>}
+                <ItemActions>
+                  <IconButton onClick={() => updateRule.mutate({ id: rule.id, data: { isActive: !rule.isActive } })}>
+                    {rule.isActive ? <Check size={16} color={theme.colors.success[500]} /> : <X size={16} color={theme.colors.gray[400]} />}
+                  </IconButton>
+                  <IconButton onClick={() => startEdit(rule)}><Edit2 size={16} /></IconButton>
+                  <IconButton onClick={() => deleteRule.mutate(rule.id)}><Trash2 size={16} color={theme.colors.error[500]} /></IconButton>
+                </ItemActions>
+              </>
+            )}
           </RuleCard>
         ))}
         {rules?.length === 0 && <EmptyState>Нет правил</EmptyState>}
@@ -605,6 +684,13 @@ const ItemReason = styled.div`
   margin-top: ${theme.spacing[1]};
 `;
 
+const ItemDate = styled.div`
+  font-size: ${theme.typography.fontSize.sm};
+  color: ${theme.colors.primary[600]};
+  font-weight: ${theme.typography.fontWeight.medium};
+  margin-top: ${theme.spacing[1]};
+`;
+
 const ItemCategory = styled.span`
   display: inline-block;
   font-size: ${theme.typography.fontSize.xs};
@@ -625,6 +711,7 @@ const ItemPrice = styled.span`
 const ItemActions = styled.div`
   display: flex;
   gap: ${theme.spacing[2]};
+  margin-top: 10px;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -656,9 +743,17 @@ const EditForm = styled.div`
   align-items: center;
 `;
 
+const EditFormFull = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing[3]};
+`;
+
 const EditActions = styled.div`
   display: flex;
   gap: ${theme.spacing[1]};
+  margin-top: ${theme.spacing[2]};
 `;
 
 const EmptyState = styled.div`
