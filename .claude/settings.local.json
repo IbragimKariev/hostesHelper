@@ -23,7 +23,15 @@
       "Bash(del appsbackendsrcscriptstest-window-fix.ts)",
       "Bash(node src/scripts/test-normalize.js:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npm run build:frontend:*)",
+      "Bash(npm run build:backend:*)",
+      "Bash(timeout 10 bash:*)",
+      "Bash(npm run dev:frontend:*)",
+      "Bash(timeout 15 bash -c 'while ! curl -s http://localhost:5173 > nul 2>&1; do sleep 1; done && echo \"\"Frontend is ready\"\"')",
+      "Bash(del:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

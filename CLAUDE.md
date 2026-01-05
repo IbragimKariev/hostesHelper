@@ -11,8 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The system allows restaurant staff to:
 - Visually design hall layouts with drag-and-drop table placement
-- Manage table reservations
-- View booking status in real-time
+- Manage table reservations and view booking status in real-time
+- Manage daily menus (stop-list items, dishes of the day)
+- View and manage staff rules
+- User authentication with role-based access (admin, hostess)
 
 ## Development Commands
 
@@ -87,6 +89,11 @@ npm run lint            # ESLint with TypeScript rules
 - **Hall**: Restaurant hall with dimensions (width/height in meters), pixelRatio (default 50), sections and walls (stored as JSON arrays)
 - **Table**: Physical tables with positionX/positionY (pixels), sizeWidth/sizeHeight, shape (rectangle/circle/oval), seats (1-20), rotation (degrees), status (available/occupied/reserved/cleaning)
 - **Reservation**: Bookings with date (DateTime), time (HH:MM string), duration (hours), status (confirmed/pending/cancelled/completed), linked to table and hall via foreign keys with CASCADE delete
+- **User**: System users with login, password, name, and roleId
+- **Role**: User roles (admin, hostess) with unique name constraint
+- **StopListItem**: Daily unavailable dishes with name, reason, category, date, and isActive flag
+- **DishOfDay**: Daily special dishes with name, description, price, category, date, and isActive flag
+- **StaffRule**: Restaurant rules for staff with title, content, priority, category, and isActive flag
 
 **API Patterns**:
 - All endpoints return `{ success: boolean, data?: T, error?: string }`
@@ -100,27 +107,31 @@ npm run lint            # ESLint with TypeScript rules
 **Important Implementation Details**:
 - Tables have unique constraint on `[hallId, number]` - table numbers must be unique within a hall
 - Deleting a hall cascades to all its tables and reservations (onDelete: Cascade)
+- Deleting a user is restricted if they have associated data (onDelete: Restrict for role foreign key)
 - Reservation dates support DD-MM-YYYY and YYYY-MM-DD formats via Zod preprocessing
 - JSON fields (Hall.sections, Hall.walls) are cast to `any` type when sending responses
+- Authentication uses JWT tokens (implementation details in auth routes)
+- Stop-list items and dishes of the day are filtered by date and isActive status
+- Staff rules are ordered by priority (higher priority = more important)
 
 ### Frontend Architecture
 
 **Tech Stack**: React 19 + Vite + React Query + styled-components + @dnd-kit
 
 **Key Directories**:
-- `src/pages/` - Page components (AdminPage, BookingPage) with component subfolders
+- `src/pages/` - Page components (AdminPage, BookingPage, LoginPage, MenuManagementPage, StaffDashboardPage, UsersPage) with component subfolders
 - `src/components/ui/` - Reusable UI components (Button, Card, Input, Modal, Select, Spinner)
-- `src/lib/api/` - Axios API clients (halls.ts, tables.ts, reservations.ts)
+- `src/lib/api/` - Axios API clients (halls.ts, tables.ts, reservations.ts, auth.ts, users.ts, roles.ts, stoplist.ts, dishes-of-day.ts, staff-rules.ts)
 - `src/lib/api-client.ts` - Axios instance configuration with VITE_API_URL
-- `src/hooks/` - React Query hooks (useHalls, useTables, useReservations)
+- `src/hooks/` - React Query hooks (useHalls, useTables, useReservations, useAuth, useUsers, useRoles, useStopList, useDishesOfDay, useStaffRules)
 - `src/styles/` - theme.ts and GlobalStyles.tsx
 
 **State Management**:
 - Server state: React Query with automatic caching, refetching, optimistic updates
-- Query keys: `['halls']`, `['halls', id]`, `['tables', hallId]`, `['reservations']`
+- Query keys: `['halls']`, `['halls', id]`, `['tables', hallId]`, `['reservations']`, `['users']`, `['roles']`, `['stoplist']`, `['dishesOfDay']`, `['staffRules']`
 - All mutations invalidate relevant queries and show toast notifications
 - Local UI state: React useState/useReducer
-- No global state library needed currently (Zustand available if needed)
+- Zustand available for global state if needed (e.g., auth state)
 
 **Key Features**:
 - Drag-and-drop table placement using @dnd-kit/core (DndContext, useDraggable, useDroppable)
@@ -136,6 +147,10 @@ npm run lint            # ESLint with TypeScript rules
 - Tables are rendered with absolute positioning using transform: translate()
 - AdminPage manages tool modes: 'select', 'add-table', 'add-section', 'add-wall'
 - BookingPage shows read-only hall view with reservation form
+- LoginPage handles authentication with JWT tokens
+- MenuManagementPage manages stop-list items, dishes of the day, and staff rules
+- UsersPage manages system users and their roles (admin/hostess)
+- StaffDashboardPage displays current stop-list items, dishes of the day, and staff rules for hostess users
 
 ## API Endpoints
 
@@ -162,6 +177,34 @@ npm run lint            # ESLint with TypeScript rules
 - `POST /api/reservations/:id/cancel` - Cancel reservation (sets status to 'cancelled')
 - `DELETE /api/reservations/:id` - Delete reservation
 - `GET /api/reservations/availability/:tableId?date=xxx&time=xxx&duration=xxx` - Check table availability
+
+### Authentication & Users
+- `POST /api/auth/login` - Login with credentials (returns JWT token)
+- `POST /api/auth/register` - Register new user (requires: name, login, password, roleId)
+- `GET /api/auth/me` - Get current user info (requires auth token)
+- `GET /api/users` - List all users
+- `GET /api/users/:id` - Get user by ID
+- `POST /api/users` - Create user (requires: name, login, password, roleId)
+- `PATCH /api/users/:id` - Update user (partial update)
+- `DELETE /api/users/:id` - Delete user
+- `GET /api/roles` - List all roles
+
+### Menu Management
+- `GET /api/stoplist?date=YYYY-MM-DD&isActive=true` - List stop-list items (filterable by date and active status)
+- `GET /api/stoplist/:id` - Get stop-list item by ID
+- `POST /api/stoplist` - Create stop-list item (requires: name; optional: reason, category)
+- `PATCH /api/stoplist/:id` - Update stop-list item (partial update)
+- `DELETE /api/stoplist/:id` - Delete stop-list item
+- `GET /api/dishes-of-day?date=YYYY-MM-DD&isActive=true` - List dishes of the day
+- `GET /api/dishes-of-day/:id` - Get dish of the day by ID
+- `POST /api/dishes-of-day` - Create dish of the day (requires: name; optional: description, price, category)
+- `PATCH /api/dishes-of-day/:id` - Update dish of the day (partial update)
+- `DELETE /api/dishes-of-day/:id` - Delete dish of the day
+- `GET /api/staff-rules?isActive=true` - List staff rules (filterable by active status, ordered by priority)
+- `GET /api/staff-rules/:id` - Get staff rule by ID
+- `POST /api/staff-rules` - Create staff rule (requires: title, content; optional: priority, category)
+- `PATCH /api/staff-rules/:id` - Update staff rule (partial update)
+- `DELETE /api/staff-rules/:id` - Delete staff rule
 
 ## Important Patterns
 
@@ -327,6 +370,9 @@ To manually test the application:
 - **JSON fields**: Hall.sections and Hall.walls are stored as JSON in PostgreSQL (for flexibility with complex shapes)
 - **Position transformation**: Backend stores positionX/positionY separately, but API transforms to `position: { x, y }` object
 - **Date formats**: Zod preprocessing supports both DD-MM-YYYY and YYYY-MM-DD formats for reservations
+- **Authentication**: JWT tokens are stored in localStorage/cookies on frontend, sent via Authorization header
+- **Role-based access**: Admin users have full access, hostess users have limited access to booking and staff dashboard
+- **Menu management**: Stop-list and dishes of the day are date-specific, staff rules are persistent
 
 ## Environment Variables
 

@@ -197,6 +197,81 @@ export const AuthResponse = z.object({
 });
 export type AuthResponse = z.infer<typeof AuthResponse>;
 
+// ===== STOP LIST =====
+export const StopListItem = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  reason: z.string().optional(),
+  category: z.string().optional(),
+  date: z.date(),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type StopListItem = z.infer<typeof StopListItem>;
+
+export const CreateStopListItemDto = z.object({
+  name: z.string().min(1),
+  reason: z.string().optional(),
+  category: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreateStopListItemDto = z.infer<typeof CreateStopListItemDto>;
+
+export const UpdateStopListItemDto = CreateStopListItemDto.partial();
+export type UpdateStopListItemDto = z.infer<typeof UpdateStopListItemDto>;
+
+// ===== DISH OF DAY =====
+export const DishOfDay = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  price: z.number().positive().optional(),
+  category: z.string().optional(),
+  date: z.date(),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type DishOfDay = z.infer<typeof DishOfDay>;
+
+export const CreateDishOfDayDto = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  price: z.number().positive().optional(),
+  category: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreateDishOfDayDto = z.infer<typeof CreateDishOfDayDto>;
+
+export const UpdateDishOfDayDto = CreateDishOfDayDto.partial();
+export type UpdateDishOfDayDto = z.infer<typeof UpdateDishOfDayDto>;
+
+// ===== STAFF RULES =====
+export const StaffRule = z.object({
+  id: z.string(),
+  title: z.string().min(1),
+  content: z.string().min(1),
+  priority: z.number().int().default(0),
+  category: z.string().optional(),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type StaffRule = z.infer<typeof StaffRule>;
+
+export const CreateStaffRuleDto = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  priority: z.number().int().optional(),
+  category: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreateStaffRuleDto = z.infer<typeof CreateStaffRuleDto>;
+
+export const UpdateStaffRuleDto = CreateStaffRuleDto.partial();
+export type UpdateStaffRuleDto = z.infer<typeof UpdateStaffRuleDto>;
+
 // ===== API RESPONSE TYPES =====
 export interface ApiResponse<T> {
   success: boolean;

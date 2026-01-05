@@ -106,3 +106,52 @@ model User {
   @@index([login])
   @@map("users")
 }
+
+// Стоп-лист (блюда, которых сегодня нет)
+model StopListItem {
+  id          String   @id @default(uuid())
+  name        String   // Название блюда
+  reason      String?  // Причина (закончилось, нет ингредиентов и т.д.)
+  category    String?  // Категория (Салаты, Супы, Горячее и т.д.)
+  date        DateTime @default(now()) // Дата добавления в стоп-лист
+  isActive    Boolean  @default(true)  // Активен ли стоп-лист
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+  @@index([isActive])
+  @@map("stop_list_items")
+}
+
+// Блюдо дня
+model DishOfDay {
+  id          String   @id @default(uuid())
+  name        String   // Название блюда
+  description String?  // Описание
+  price       Float?   // Цена (опционально)
+  category    String?  // Категория
+  date        DateTime @default(now()) // Дата
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+  @@index([isActive])
+  @@map("dishes_of_day")
+}
+
+// Правила для сотрудников
+model StaffRule {
+  id          String   @id @default(uuid())
+  title       String   // Заголовок правила
+  content     String   // Содержание правила
+  priority    Int      @default(0) // Приоритет отображения (чем выше, тем важнее)
+  category    String?  // Категория (Общие, Безопасность, Обслуживание и т.д.)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([priority])
+  @@map("staff_rules")
+}

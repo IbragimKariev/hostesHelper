@@ -9,6 +9,9 @@ import reservationsRouter from './routes/reservations';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import rolesRouter from './routes/roles';
+import stoplistRouter from './routes/stoplist';
+import dishesOfDayRouter from './routes/dishes-of-day';
+import staffRulesRouter from './routes/staff-rules';
 
 dotenv.config();
 
@@ -40,6 +43,9 @@ app.use('/api/roles', rolesRouter);
 app.use('/api/halls', hallsRouter);
 app.use('/api/tables', tablesRouter);
 app.use('/api/reservations', reservationsRouter);
+app.use('/api/stoplist', stoplistRouter);
+app.use('/api/dishes-of-day', dishesOfDayRouter);
+app.use('/api/staff-rules', staffRulesRouter);
 
 // Error handling
 app.use(errorHandler);

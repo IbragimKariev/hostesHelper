@@ -4,3 +4,6 @@ export * from './reservations';
 export * from './auth';
 export * from './users';
 export * from './roles';
+export * from './stoplist';
+export * from './dishes-of-day';
+export * from './staff-rules';
