@@ -12,6 +12,7 @@ import rolesRouter from './routes/roles';
 import stoplistRouter from './routes/stoplist';
 import dishesOfDayRouter from './routes/dishes-of-day';
 import staffRulesRouter from './routes/staff-rules';
+import waitersRouter from './routes/waiters';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/api/reservations', reservationsRouter);
 app.use('/api/stoplist', stoplistRouter);
 app.use('/api/dishes-of-day', dishesOfDayRouter);
 app.use('/api/staff-rules', staffRulesRouter);
+app.use('/api/waiters', waitersRouter);
 
 // Error handling
 app.use(errorHandler);

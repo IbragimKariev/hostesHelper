@@ -13,6 +13,7 @@ export const GlobalStyles = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
@@ -22,6 +23,7 @@ export const GlobalStyles = createGlobalStyle`
     color: ${theme.colors.text.primary};
     background-color: ${theme.colors.background};
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   #root {

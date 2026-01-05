@@ -7,3 +7,4 @@ export * from './roles';
 export * from './stoplist';
 export * from './dishes-of-day';
 export * from './staff-rules';
+export * from './waiters';

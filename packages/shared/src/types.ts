@@ -77,6 +77,19 @@ export const Hall = z.object({
 });
 export type Hall = z.infer<typeof Hall>;
 
+// ===== WAITER =====
+export const Waiter = z.object({
+  id: z.string(),
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  birthYear: z.number().int().min(1950).max(2010).optional(),
+  languages: z.array(z.string()).default([]),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type Waiter = z.infer<typeof Waiter>;
+
 // ===== RESERVATION =====
 export const Reservation = z.object({
   id: z.string(),
@@ -91,6 +104,8 @@ export const Reservation = z.object({
   duration: z.number().min(0.5).max(8),
   status: ReservationStatus,
   specialRequests: z.string().optional(),
+  waiterId: z.string().optional(),
+  waiter: Waiter.optional(),
   createdAt: z.date(),
   updatedAt: z.date().optional(),
 });
@@ -133,6 +148,19 @@ export type CreateTableDto = z.infer<typeof CreateTableDto>;
 export const UpdateTableDto = CreateTableDto.partial();
 export type UpdateTableDto = z.infer<typeof UpdateTableDto>;
 
+// Waiter DTOs
+export const CreateWaiterDto = z.object({
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  birthYear: z.number().int().min(1950).max(2010).optional(),
+  languages: z.array(z.string()).default([]),
+  isActive: z.boolean().optional(),
+});
+export type CreateWaiterDto = z.infer<typeof CreateWaiterDto>;
+
+export const UpdateWaiterDto = CreateWaiterDto.partial();
+export type UpdateWaiterDto = z.infer<typeof UpdateWaiterDto>;
+
 // Reservation DTOs
 export const CreateReservationDto = z.object({
   tableId: z.string(),
@@ -157,6 +185,7 @@ export const CreateReservationDto = z.object({
   duration: z.number().min(0.5).max(8),
   status: ReservationStatus.optional(),
   specialRequests: z.string().optional(),
+  waiterId: z.string().optional(),
 });
 export type CreateReservationDto = z.infer<typeof CreateReservationDto>;
 

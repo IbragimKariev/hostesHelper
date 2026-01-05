@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-r
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { GlobalStyles } from '@/styles/GlobalStyles';
-import { LayoutGrid, Calendar, Users, LogOut, Utensils, Briefcase, Menu, X } from 'lucide-react';
+import { LayoutGrid, Calendar, Users, LogOut, Utensils, Briefcase, Menu, X, UserCheck } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
@@ -15,6 +15,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { UsersPage } from '@/pages/UsersPage';
 import MenuManagementPage from '@/pages/MenuManagementPage';
 import StaffDashboardPage from '@/pages/StaffDashboardPage';
+import { WaitersPage } from '@/pages/WaitersPage';
 
 const App = () => {
   const location = useLocation();
@@ -107,6 +108,10 @@ const App = () => {
                       <Utensils size={20} />
                       <span>Управление меню</span>
                     </NavLink>
+                    <NavLink to="/waiters" $active={location.pathname === '/waiters'}>
+                      <UserCheck size={20} />
+                      <span>Официанты</span>
+                    </NavLink>
                     <NavLink to="/users" $active={location.pathname === '/users'}>
                       <Users size={20} />
                       <span>Пользователи</span>
@@ -160,6 +165,10 @@ const App = () => {
                         <Utensils size={20} />
                         <span>Управление меню</span>
                       </MobileNavLink>
+                      <MobileNavLink to="/waiters" $active={location.pathname === '/waiters'}>
+                        <UserCheck size={20} />
+                        <span>Официанты</span>
+                      </MobileNavLink>
                       <MobileNavLink to="/users" $active={location.pathname === '/users'}>
                         <Users size={20} />
                         <span>Пользователи</span>
@@ -202,6 +211,14 @@ const App = () => {
               }
             />
             <Route
+              path="/waiters"
+              element={
+                <ProtectedRoute adminOnly>
+                  <WaitersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/users"
               element={
                 <ProtectedRoute adminOnly>
@@ -226,6 +243,7 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: ${theme.colors.background};
+  overflow-x: hidden;
 `;
 
 const Navigation = styled.nav`
@@ -478,9 +496,10 @@ const MobileMenu = styled.div<{ $isOpen: boolean }>`
   background: white;
   box-shadow: ${theme.shadows.xl};
   transform: translateX(${(props) => (props.$isOpen ? '0' : '100%')});
-  transition: transform ${theme.transitions.base};
+  transition: transform ${theme.transitions.base}, visibility ${theme.transitions.base};
   z-index: ${theme.zIndex.modal};
   overflow-y: auto;
+  visibility: ${(props) => (props.$isOpen ? 'visible' : 'hidden')};
 
   @media (max-width: 768px) {
     display: block;

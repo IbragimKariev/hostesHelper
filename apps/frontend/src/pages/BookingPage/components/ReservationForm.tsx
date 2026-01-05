@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button, Input, Select, Modal } from '@/components/ui';
 import { useCreateReservation, useUpdateReservation, useReservations } from '@/hooks/useReservations';
+import { useWaiters } from '@/hooks/useWaiters';
 import type { Reservation, CreateReservationDto } from '@hostes/shared';
 import { X, AlertTriangle } from 'lucide-react';
 
@@ -46,6 +47,9 @@ export const ReservationForm = ({
     return new Date(`${year}-${month}-${day}`);
   };
 
+  // Получить список активных официантов
+  const { data: waiters } = useWaiters(true);
+
   const {
     register,
     handleSubmit,
@@ -63,6 +67,7 @@ export const ReservationForm = ({
           duration: reservation.duration,
           status: reservation.status,
           specialRequests: reservation.specialRequests || '',
+          waiterId: reservation.waiterId || '',
         }
       : {
           tableId: defaultTableId || '',
@@ -74,6 +79,7 @@ export const ReservationForm = ({
           duration: 2,
           status: 'pending' as const,
           specialRequests: '',
+          waiterId: '',
         },
   });
 
@@ -137,6 +143,7 @@ export const ReservationForm = ({
         duration: parseFloat(data.duration),
         status: data.status,
         specialRequests: data.specialRequests || undefined,
+        waiterId: data.waiterId || undefined,
       };
 
       if (reservation) {
@@ -272,16 +279,31 @@ export const ReservationForm = ({
           />
         </FormRow>
 
-        <Select
-          label="Статус"
-          error={errors.status?.message}
-          {...register('status')}
-        >
-          <option value="pending">В ожидании</option>
-          <option value="confirmed">Подтверждено</option>
-          <option value="cancelled">Отменено</option>
-          <option value="completed">Завершено</option>
-        </Select>
+        <FormRow>
+          <Select
+            label="Статус"
+            error={errors.status?.message}
+            {...register('status')}
+          >
+            <option value="pending">В ожидании</option>
+            <option value="confirmed">Подтверждено</option>
+            <option value="cancelled">Отменено</option>
+            <option value="completed">Завершено</option>
+          </Select>
+
+          <Select
+            label="Официант"
+            error={errors.waiterId?.message}
+            {...register('waiterId')}
+          >
+            <option value="">Не выбран</option>
+            {waiters?.map((waiter) => (
+              <option key={waiter.id} value={waiter.id}>
+                {waiter.lastName} {waiter.firstName}
+              </option>
+            ))}
+          </Select>
+        </FormRow>
 
         <Textarea
           label="Особые пожелания"

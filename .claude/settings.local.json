@@ -31,7 +31,8 @@
       "Bash(npm run dev:frontend:*)",
       "Bash(timeout 15 bash -c 'while ! curl -s http://localhost:5173 > nul 2>&1; do sleep 1; done && echo \"\"Frontend is ready\"\"')",
       "Bash(del:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
