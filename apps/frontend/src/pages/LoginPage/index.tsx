@@ -118,14 +118,17 @@ export const LoginPage = () => {
                 </form>
 
                 <div className={styles.footer}>
-                    <p>Учетные данные для теста:</p>
-                    <p>
-                        <strong>Админ:</strong> admin / admin123
-                    </p>
-                    <p>
-                        <strong>Хостес:</strong> hostess / hostess123
-                    </p>
-                    111
+                    <p className={styles.footerTitle}>Тестовые учётные данные</p>
+                    <div className={styles.credentials}>
+                        <div className={styles.credential}>
+                            <span className={styles.credentialRole}>Админ</span>
+                            <code>admin / admin123</code>
+                        </div>
+                        <div className={styles.credential}>
+                            <span className={styles.credentialRole}>Хостес</span>
+                            <code>hostess / hostess123</code>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,31 +1,31 @@
 export const theme = {
   colors: {
-    // Primary colors
+    // Primary colors - единый фиолетово-синий градиент
     primary: {
-      50: '#f0f9ff',
-      100: '#e0f2fe',
-      200: '#bae6fd',
-      300: '#7dd3fc',
-      400: '#38bdf8',
-      500: '#0ea5e9',
-      600: '#0284c7',
-      700: '#0369a1',
-      800: '#075985',
-      900: '#0c4a6e',
+      50: '#f5f3ff',
+      100: '#ede9fe',
+      200: '#ddd6fe',
+      300: '#c4b5fd',
+      400: '#a78bfa',
+      500: '#8b5cf6',
+      600: '#7c3aed',
+      700: '#6d28d9',
+      800: '#5b21b6',
+      900: '#4c1d95',
     },
 
-    // Secondary colors
+    // Secondary colors - для акцентов
     secondary: {
-      50: '#faf5ff',
-      100: '#f3e8ff',
-      200: '#e9d5ff',
-      300: '#d8b4fe',
-      400: '#c084fc',
-      500: '#a855f7',
-      600: '#9333ea',
-      700: '#7e22ce',
-      800: '#6b21a8',
-      900: '#581c87',
+      50: '#ecfeff',
+      100: '#cffafe',
+      200: '#a5f3fc',
+      300: '#67e8f9',
+      400: '#22d3ee',
+      500: '#06b6d4',
+      600: '#0891b2',
+      700: '#0e7490',
+      800: '#155e75',
+      900: '#164e63',
     },
 
     // Success
@@ -85,15 +85,24 @@ export const theme = {
     },
 
     // Semantic colors
-    background: '#ffffff',
-    surface: '#f9fafb',
+    background: '#fafafa',
+    surface: '#ffffff',
+    surfaceElevated: '#ffffff',
     text: {
-      primary: '#111827',
-      secondary: '#6b7280',
-      disabled: '#9ca3af',
+      primary: '#18181b',
+      secondary: '#71717a',
+      disabled: '#a1a1aa',
     },
-    border: '#e5e7eb',
-    divider: '#e5e7eb',
+    border: '#e4e4e7',
+    divider: '#f4f4f5',
+
+    // Градиенты
+    gradient: {
+      primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      primaryHover: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+      accent: 'linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)',
+      surface: 'linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%)',
+    },
   },
 
   typography: {

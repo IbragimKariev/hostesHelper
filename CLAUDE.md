@@ -59,6 +59,12 @@ npm run build:frontend
 npm run build:backend
 ```
 
+### Linting
+```bash
+# Frontend only (from apps/frontend)
+npm run lint            # ESLint with TypeScript rules
+```
+
 ## Architecture
 
 ### Monorepo Structure

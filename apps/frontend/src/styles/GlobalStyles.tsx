@@ -12,6 +12,7 @@ export const GlobalStyles = createGlobalStyle`
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -20,6 +21,7 @@ export const GlobalStyles = createGlobalStyle`
     line-height: ${theme.typography.lineHeight.normal};
     color: ${theme.colors.text.primary};
     background-color: ${theme.colors.background};
+    min-height: 100vh;
   }
 
   #root {
@@ -29,12 +31,12 @@ export const GlobalStyles = createGlobalStyle`
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: ${theme.colors.gray[100]};
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -61,5 +63,55 @@ export const GlobalStyles = createGlobalStyle`
   /* Disable focus outline for mouse users */
   :focus:not(:focus-visible) {
     outline: none;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slideInRight {
+    animation: slideInRight 0.3s ease-out;
   }
 `;
